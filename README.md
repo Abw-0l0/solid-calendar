@@ -30,7 +30,6 @@ The trade was a bigger bundle in exchange for less control over the part of the 
 npm install steadycalendar
 ```
 
-One package, no runtime dependencies, nothing else to install.
 
 | Entry point | Artifact |
 |---|---|
@@ -40,7 +39,11 @@ One package, no runtime dependencies, nothing else to install.
 | `import 'steadycalendar/styles'` | `dist/calendar.css` |
 | `import { CalendarState } from 'steadycalendar/headless'` | state and data only, 8.7 kB gzip |
 
-Node 18+ to build and test. Nothing to install at runtime.
+One package, nothing to install at runtime. Runs on **Node 18+** — CI proves it by
+installing the published tarball on 18, 20, 22 and 24 and using it.
+
+Building the repository itself needs Node 22.22+ or 24.15+, which is jsdom's floor, not the
+package's. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Quickstart
 
@@ -372,7 +375,11 @@ Several guards exist because of specific failures this codebase had:
 - **`types.test.js`** asserts every runtime export is declared, and that the headless entry does not declare `CalendarApp` — which would let TypeScript accept an import that fails at runtime.
 - **`check:imports`** makes every file an entry point, because the normal build resolves only one.
 
-CI runs build, lint, typecheck, tests and both artifact checks on Node 18/20/22 across Linux, Windows and macOS, plus the whole suite under six timezones, coverage, and CodeQL.
+CI runs build, lint, typecheck, tests and both artifact checks on Node 22 and 24 across
+Linux, Windows and macOS — jsdom 30 sets that floor for the toolchain. The package's own
+Node 18+ claim is a separate question, so a further job installs the packed tarball on Node
+18, 20, 22 and 24 and calls it, with no dev dependencies present. On top of that: the whole
+suite under six timezones, coverage, CodeQL, and dependency review.
 
 jsdom has no layout engine, so it proves structure, not appearance. `examples/index.html` is the human check.
 

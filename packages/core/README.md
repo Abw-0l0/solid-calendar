@@ -2,6 +2,8 @@
 
 A resource-scheduling calendar for booking and appointment apps. Vanilla JavaScript, zero runtime dependencies, 27.1 kB gzipped.
 
+![license](https://img.shields.io/badge/license-MIT-blue) ![bundle](https://img.shields.io/badge/bundle-27.1%20kB%20gzip-informational) ![dependencies](https://img.shields.io/badge/runtime%20deps-0-brightgreen) ![tests](https://img.shields.io/badge/tests-246%20passing-brightgreen)
+
 Built for, and proven in, a commercial booking product at scale — then generalised so the shape of your data is your choice, not the calendar's.
 
 - Day, 3-day and week grids with one column per person, room, or machine
@@ -19,7 +21,7 @@ Full documentation: **[github.com/Abw-0l0/steady-calendar](https://github.com/Ab
 npm install steadycalendar
 ```
 
-There is nothing else to install. Node 18+ to build from source.
+There is nothing else to install. Runs on Node 18+ and every current browser.
 
 ## Quickstart
 
@@ -90,6 +92,30 @@ import { JA_TRANSLATIONS } from 'steadycalendar';
 
 new CalendarApp({ locale: 'ja-JP', translations: JA_TRANSLATIONS, /* … */ });
 ```
+
+## Persisting changes
+
+Dragging moves an event on screen; saving it is yours. `DragPersistencePlugin` wires the
+two together, reverting the element if your write fails:
+
+```js
+import { CalendarApp, DragPersistencePlugin } from 'steadycalendar';
+
+new CalendarApp({
+  plugins: [new DragPersistencePlugin({
+    async onDrop(event, { date, startTime, resourceId }) {
+      await api.moveBooking(event.id, { date, startTime, resourceId });
+    },
+    async onResize(event, { endTime }) {
+      await api.resizeBooking(event.id, { endTime });
+    },
+  })],
+  /* … */
+});
+```
+
+`canDrop` / `canResize` reject a gesture before it is written, and `blockedStatuses`
+freezes events by their raw status.
 
 ## Entry points
 
