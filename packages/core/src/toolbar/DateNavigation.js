@@ -108,8 +108,10 @@ export default class DateNavigation {
         const duration = this.state.viewDuration;
 
         if (duration === 'month') {
-            const newDate = addMonths(this.state.currentDate, direction);
-            this.state.setCurrentDate(newDate.toString());
+            // addMonths already returns 'YYYY-MM-DD'. The .toString() that used to be here
+            // was a no-op that read as though it returned a date object — the same
+            // misreading that left DatePicker's month arrows dead.
+            this.state.setCurrentDate(addMonths(this.state.currentDate, direction));
             return;
         }
 

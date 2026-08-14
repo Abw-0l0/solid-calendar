@@ -28,6 +28,32 @@ function declaredNames(file, seen = new Set()) {
     return names;
 }
 
+/**
+ * Only the declarations that must have a runtime counterpart.
+ *
+ * `interface` and `type` are erased at compile time and can never appear in a module's
+ * Object.keys(), so including them is what forced the checks below to run in one
+ * direction only. One direction is how `holidays` shipped declared on the headless entry
+ * but absent from it: `import { holidays } from 'steadycalendar/headless'` compiled, then
+ * threw.
+ */
+function declaredValueNames(file, seen = new Set()) {
+    if (seen.has(file)) return new Set();
+    seen.add(file);
+    const source = readFileSync(file, 'utf8');
+    const names = new Set();
+
+    const DECL = /export\s+(?:declare\s+)?(?:class|const|function|namespace|enum)\s+([A-Za-z_$][\w$]*)/g;
+    for (const m of source.matchAll(DECL)) names.add(m[1]);
+
+    for (const m of source.matchAll(/export \* from '\.\/([\w.-]+)\.js';/g)) {
+        for (const n of declaredValueNames(`types/${m[1]}.d.ts`, seen)) names.add(n);
+    }
+    return names;
+}
+
+const sorted = (names) => [...names].sort();
+
 describe('type declarations', () => {
     it('should_declare_every_runtime_export_of_the_package_root', () => {
         const declared = declaredNames('types/index.d.ts');
@@ -39,6 +65,16 @@ describe('type declarations', () => {
         const declared = declaredNames('types/headless.d.ts');
         const undeclared = Object.keys(headless).filter((n) => !declared.has(n));
         expect(undeclared).toEqual([]);
+    });
+
+    // The two above ask only "is every runtime export declared?". These assert equality,
+    // so they also catch the reverse — a declaration with no runtime export behind it.
+    it('should_match_declarations_to_runtime_exports_exactly_on_the_root', () => {
+        expect(sorted(declaredValueNames('types/index.d.ts'))).toEqual(sorted(Object.keys(index)));
+    });
+
+    it('should_match_declarations_to_runtime_exports_exactly_on_the_headless_entry', () => {
+        expect(sorted(declaredValueNames('types/headless.d.ts'))).toEqual(sorted(Object.keys(headless)));
     });
 
     it('should_not_declare_CalendarApp_on_the_headless_entry', () => {

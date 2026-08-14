@@ -148,9 +148,14 @@ jobs:
             console.log('require() ok on node ' + process.version + ' — ' + Object.keys(api).length + ' exports');
           "
           node --input-type=module -e "
-            import { temporal, SLOT_INTERVAL } from 'steadycalendar/headless';
+            import { temporal, SLOT_INTERVAL, holidays } from 'steadycalendar/headless';
             if (temporal.addMonths('2026-01-31', 1) !== '2026-02-28') throw new Error('month clamping wrong');
             if (SLOT_INTERVAL !== 10) throw new Error('constant missing');
+            // Declared on this subpath since 0.3.0, exported from it only since 0.6.0 —
+            // the import typechecked and threw for two releases.
+            if (!holidays.isHoliday('2026-01-01', {}, { holidays: { '2026-01-01': 'New Year' } })) {
+              throw new Error('holidays missing from the headless entry');
+            }
             console.log('headless esm ok on node ' + process.version);
           "
 

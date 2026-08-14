@@ -103,7 +103,7 @@ describe('EventMapper', () => {
     it('should_call_resolve_event_fields', () => {
         const resolveEventFields = vi.fn().mockReturnValue({
             textFields: { client: 'Alice' },
-            badges: [{ id: 'vip', text: 'VIP' }]
+            badges: [{ typeId: 'vip', label: 'VIP' }]
         });
         const mapper = createMapper({ callbacks: { resolveEventFields } });
         const events = mapper.mapAll([{
@@ -117,7 +117,7 @@ describe('EventMapper', () => {
         }]);
         expect(resolveEventFields).toHaveBeenCalled();
         expect(events[0].textFields).toEqual({ client: 'Alice' });
-        expect(events[0].badges).toEqual([{ id: 'vip', text: 'VIP' }]);
+        expect(events[0].badges).toEqual([{ typeId: 'vip', label: 'VIP' }]);
     });
 
     it('should_collapse_a_multi_assignee_timeblock_in_a_flat_view', () => {

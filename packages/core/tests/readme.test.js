@@ -115,7 +115,7 @@ describe('README examples', () => {
                     resolveEventFields(raw) {
                         return {
                             textFields: { room: raw.room_name },
-                            badges: raw.is_first_visit ? [{ id: 'new', style: 'solid', text: 'New' }] : [],
+                            badges: raw.is_first_visit ? [{ typeId: 'new', label: 'New' }] : [],
                         };
                     },
                 },
@@ -141,7 +141,60 @@ describe('README examples', () => {
             expect(event.isTimeBlock).toBe(false);
             expect(event.isCancelled).toBe(false);
             expect(event.textFields).toEqual({ room: 'Room 2' });
-            expect(event.badges).toEqual([{ id: 'new', style: 'solid', text: 'New' }]);
+            expect(event.badges).toEqual([{ typeId: 'new', label: 'New' }]);
+        });
+    });
+
+    describe('card content', () => {
+        let calendar;
+        afterEach(() => { calendar?.destroy(); calendar = null; });
+
+        it('should_render_the_fields_and_badge_from_the_card_content_section', async () => {
+            calendar = new CalendarApp({
+                el: '#calendar',
+                cardDisplaySettings: {
+                    textItems: [
+                        { id: 'client', name: 'Client', visible: true, order: 1 },
+                        { id: 'time', name: 'Time', visible: true, order: 2 },
+                        { id: 'room', name: 'Room', visible: true, order: 3 },
+                    ],
+                    badgeItems: [{ id: 'status', name: 'Status', visible: true, order: 1 }],
+                },
+                badgeTypes: {
+                    status: { style: 'outlined', bgColor: '#1f2937', textColor: '#f9fafb', maxWidth: 90 },
+                },
+                callbacks: {
+                    resolveEventFields: (raw, mapped) => ({
+                        textFields: { client: mapped.clientName, room: raw.room_name ?? '' },
+                        badges: raw.state === 'confirmed'
+                            ? [{ typeId: 'status', label: 'Confirmed', tooltip: 'Confirmed by the client' }]
+                            : [],
+                    }),
+                },
+                dataSource: {
+                    async fetchResources() {
+                        return { resources: [{ id: 'u7', name: 'Casey Rivera', color: '#38A169' }] };
+                    },
+                    async fetchEvents() {
+                        return [{
+                            id: 'bk-2', date: TODAY, start_time: '14:00', end_time: '14:40',
+                            assignee: { id: 'u7' }, client: { name: 'K. Ito' },
+                            room_name: 'Room 2', state: 'confirmed', status: 'Active',
+                        }];
+                    },
+                },
+            });
+            await calendar.init();
+
+            const el = document.querySelector('#calendar');
+            // The first visible field with a value becomes the title, whatever its id.
+            expect(el.querySelector('.sc-event-title').textContent).toBe('K. Ito');
+            expect(el.querySelector('.sc-event-field--room').textContent).toBe('Room 2');
+
+            const badge = el.querySelector('.sc-event-badge');
+            expect(badge.querySelector('.sc-event-badge-label').textContent).toBe('Confirmed');
+            expect(badge.title).toBe('Confirmed by the client');
+            expect(badge.classList.contains('sc-event-badge--outlined')).toBe(true);
         });
     });
 

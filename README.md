@@ -252,6 +252,78 @@ Renderers never see your raw shape. Each event carries `resourceOwnerId`, `resou
 
 The rendering classes are exported too — `ViewManager`, `CalendarToolbar`, `EventRenderer`, the four views and the five interaction handlers — so you can compose your own shell. Each takes `(state, bus, config)` and exposes `init(container)` / `destroy()`. Internal column builders are deliberately not exported; their contracts are not stable.
 
+## Card content
+
+Without `cardDisplaySettings`, a card shows a title, the time and the service. To choose
+the lines yourself, declare which ids to show and then supply their values:
+
+```js
+new CalendarApp({
+  cardDisplaySettings: {
+    textItems: [
+      { id: 'client',  name: 'Client',  visible: true, order: 1 },
+      { id: 'time',    name: 'Time',    visible: true, order: 2 },
+      { id: 'room',    name: 'Room',    visible: true, order: 3 },
+    ],
+  },
+
+  callbacks: {
+    // `mapped` carries the normalised projections, so reach for those rather than
+    // digging through `raw`.
+    resolveEventFields: (raw, mapped) => ({
+      textFields: { client: mapped.clientName, room: raw.room_name ?? '' },
+    }),
+  },
+});
+```
+
+`'time'` is the one reserved id — it renders the formatted range rather than reading
+`textFields`. Any id resolving to an empty string is skipped, so a card never shows a
+blank line. The first visible field with a value becomes `.sc-event-title` whatever it is
+called; the rest get `.sc-event-field--<id>`.
+
+### Badges
+
+A badge carries content; `config.badgeTypes` carries its appearance, so one styling
+decision covers every event. **Three things must agree**, and a miss on any of them is
+skipped silently:
+
+```js
+new CalendarApp({
+  cardDisplaySettings: {
+    textItems: [ /* … */ ],
+    // 1. The slot, and its position.
+    badgeItems: [{ id: 'status', name: 'Status', visible: true, order: 1 }],
+  },
+
+  // 2. How every badge with that id looks. No entry here means no badge.
+  badgeTypes: {
+    status: { style: 'outlined', bgColor: '#1f2937', textColor: '#f9fafb', maxWidth: 90 },
+  },
+
+  callbacks: {
+    resolveEventFields: (raw) => ({
+      // 3. The badge itself. `typeId` is what joins it to the two above.
+      badges: raw.state === 'confirmed'
+        ? [{ typeId: 'status', label: 'Confirmed', tooltip: 'Confirmed by the client' }]
+        : [],
+    }),
+  },
+});
+```
+
+A badge may also carry a `count`, rendered in parentheses after the label, and
+`meta.showSecondaryIcon` to draw `badgeTypes[id].createSecondaryIcon()` alongside
+`createIcon()`. Badges render in `badgeItems` order, not in the order of the array you
+return, and time blocks never show them.
+
+Privacy mode blurs whichever fields and badges you nominate — a display state for a
+screen in a public area, not a security control, since the values are still in the DOM:
+
+```js
+new CalendarApp({ privacySuppression: { textFieldIds: ['client'], badgeIds: ['status'] } });
+```
+
 ## Recipes
 
 ### Persisting a drag
