@@ -14,7 +14,7 @@ const { convertTimeToMinutes, convertMinutesToTime } = temporal;
     <div class="doc-content">
       <h1>Headless mode</h1>
       <p class="doc-lead">
-        State, data loading, field mapping and date arithmetic with no DOM at all — 8.7 kB gzipped. Use it when
+        State, data loading, field mapping and date arithmetic with no DOM at all — 8.9 kB gzipped. Use it when
         you want the scheduling logic but intend to render everything yourself, or when there is nothing to
         render because you are on a server.
       </p>
@@ -85,21 +85,20 @@ const { convertTimeToMinutes, convertMinutesToTime } = temporal;
       <p>
         {{ headlessCount }} exports: <code>EventBus</code>, <code>CalendarState</code>,
         <code>DataBridge</code>, <code>PreferencesBridge</code>, <code>EventMapper</code>,
-        <code>PluginManager</code>, the <code>temporal</code> and <code>ColorUtils</code> namespaces, the field
-        maps, the translations, and the grid constants.
+        <code>PluginManager</code>, the <code>temporal</code>, <code>ColorUtils</code> and
+        <code>holidays</code> namespaces, the field maps, the translations, and the grid constants.
       </p>
       <div class="note">
         <strong><code>CalendarApp</code> is deliberately absent</strong>, and a test in the library asserts it
         stays that way — including it would drag the entire rendering layer back into the bundle and defeat
         the point.
       </div>
-      <div class="note note--danger">
-        <strong>The <code>holidays</code> namespace typechecks here but does not exist at runtime.</strong>
-        <code>types/headless.d.ts</code> re-exports everything from <code>core.d.ts</code>, which declares
-        <code>holidays</code> — but the headless entry does not export it. So
-        <code>import &#123; holidays &#125; from 'steadycalendar/headless'</code> compiles and then throws.
-        Verified against 0.5.0: the root entry exports 47 names, the headless entry 29, and
-        <code>holidays</code> is in the difference. Import it from <code>steadycalendar</code> instead.
+      <div class="note">
+        <strong>The <code>holidays</code> namespace needs 0.6.0.</strong>
+        It was declared on this subpath from 0.3.0 but never exported from it, so
+        <code>import &#123; holidays &#125; from 'steadycalendar/headless'</code> compiled and then threw.
+        Fixed in 0.6.0 — the library now asserts its declarations and runtime exports match exactly, in both
+        directions, on both entry points.
       </div>
 
       <h2>On the server</h2>
@@ -195,7 +194,7 @@ const { convertTimeToMinutes, convertMinutesToTime } = temporal;
 })
 export class HeadlessPage {
   protected readonly staffList = STAFF;
-  protected readonly headlessCount = 29;
+  protected readonly headlessCount = 30;
 
   protected readonly date = signal(TODAY);
   protected readonly duration = signal(30);

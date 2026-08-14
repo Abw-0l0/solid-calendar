@@ -13,7 +13,7 @@ import { NAV_GROUPS } from './app.routes';
         <a class="doc-brand" routerLink="/">
           <span class="doc-brand-mark">SC</span>
           <span>SteadyCalendar</span>
-          <span class="doc-brand-version">0.5.0</span>
+          <span class="doc-brand-version">0.6.0</span>
         </a>
 
         <nav class="doc-nav">

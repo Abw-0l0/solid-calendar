@@ -55,7 +55,7 @@ import { demoDataSource } from '../data';
             <tr>
               <td><code>from 'steadycalendar/headless'</code></td>
               <td><code>calendar.headless.esm.js</code></td>
-              <td>State and data with no DOM, 8.7 kB gzip.</td>
+              <td>State and data with no DOM, 8.9 kB gzip.</td>
             </tr>
           </tbody>
         </table>

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal, viewChild } from '@angular/core';
-import type { CalendarApp, CalendarConfig, ResourceMode } from 'steadycalendar';
+import type { CalendarApp, CalendarConfig, MappedEvent, ResourceMode } from 'steadycalendar';
 import { DEFAULT_TRANSLATIONS, JA_TRANSLATIONS, RESOURCE_MODES, VIEW_TYPES } from 'steadycalendar';
 import { ScCalendarComponent } from '../calendar/sc-calendar.component';
 import { EventLogComponent } from '../shell/event-log.component';
@@ -385,13 +385,13 @@ export class PlaygroundPage {
             },
             privacySuppression: { textFieldIds: ['client'], badgeIds: [] },
             callbacks: {
-              resolveEventFields: (raw: any, mapped: any) => ({
+              resolveEventFields: (raw: any, mapped: MappedEvent) => ({
                 textFields: {
-                  client: mapped?.clientName ?? '',
-                  service: mapped?.serviceName ?? '',
+                  client: mapped.clientName,
+                  service: mapped.serviceName,
                 },
                 badges: raw?.secondaryResources?.length
-                  ? [{ typeId: 'room', label: String(raw.secondaryResources[0].id).toUpperCase() } as any]
+                  ? [{ typeId: 'room', label: String(raw.secondaryResources[0].id).toUpperCase() }]
                   : [],
               }),
             },
@@ -486,7 +486,7 @@ export class PlaygroundPage {
         '  callbacks: {',
         '    resolveEventFields: (raw, mapped) => ({',
         '      textFields: { client: mapped.clientName, service: mapped.serviceName },',
-        '      // typeId — not id, whatever the .d.ts says.',
+        '      // typeId joins the badge to badgeItems and badgeTypes.',
         "      badges: raw.secondaryResources?.length",
         "        ? [{ typeId: 'room', label: raw.secondaryResources[0].id.toUpperCase() }]",
         '        : [],',
