@@ -1,7 +1,7 @@
 /**
  * ResourceColumnBuilder — Builds columns for resource views
  *
- * Creates one column per resource (staff/room/equipment) with a colored
+ * Creates one column per resource (primary or secondary) with a colored
  * header dot, title, and a relatively-positioned body for event placement.
  *
  * Supports two modes:
@@ -290,16 +290,16 @@ export default class ResourceColumnBuilder {
     }
 
     /**
-     * Apply staff filter — hide/show columns based on selected staff IDs
-     * @param {string[]} staffIds - checked staff IDs
+     * Apply the resource filter — hide/show columns by selected id
+     * @param {string[]} resourceIds - checked primary-resource ids
      */
-    applyStaffFilter(staffIds) {
+    applyResourceFilter(resourceIds) {
         const mode = this.state.currentResourceMode;
         if (isFlatMode(mode)) {
             return;
         }
 
-        const staffSet = new Set(staffIds.map(String));
+        const resourceSet = new Set(resourceIds.map(String));
 
         for (const [, column] of this._columnMap) {
             const resourceId = column.dataset.resourceId;
@@ -313,7 +313,7 @@ export default class ResourceColumnBuilder {
                 continue;
             }
 
-            column.style.display = staffSet.has(String(resourceId)) ? '' : 'none';
+            column.style.display = resourceSet.has(String(resourceId)) ? '' : 'none';
         }
 
         // Grouped mode: hide date groups where all sub-columns are hidden

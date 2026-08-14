@@ -17,7 +17,7 @@
 /** @type {Record<string, string>} */
 export const DEFAULT_TRANSLATIONS = Object.freeze({
     // Toolbar
-    Reservations: 'Schedule',
+    schedule: 'Schedule',
     today: 'Today',
     previous: 'Previous',
     next: 'Next',
@@ -28,8 +28,8 @@ export const DEFAULT_TRANSLATIONS = Object.freeze({
     privacyMode: 'Privacy mode',
 
     // Resource filter
-    staffDisplay: 'Resources',
-    staff: 'Resources',
+    resourceDisplay: 'Resources',
+    resources: 'Resources',
     selectAll: 'Select all',
 
     // Date picker
@@ -64,7 +64,7 @@ export const DEFAULT_TRANSLATIONS = Object.freeze({
  * choices for a host serving several regions.
  */
 export const JA_TRANSLATIONS = Object.freeze({
-    Reservations: '予約',
+    schedule: '予約',
     today: '今日',
     previous: '前へ',
     next: '次へ',
@@ -74,8 +74,8 @@ export const JA_TRANSLATIONS = Object.freeze({
     addReservation: '予約を追加',
     privacyMode: 'プライバシーモード',
 
-    staffDisplay: 'スタッフ表示',
-    staff: 'スタッフ',
+    resourceDisplay: 'リソース表示',
+    resources: 'リソース',
     selectAll: '全選択',
 
     previousMonthText: '前の月',
@@ -84,12 +84,12 @@ export const JA_TRANSLATIONS = Object.freeze({
 
     listTime: '時間',
     listClient: '顧客',
-    listResource: 'スタッフ',
-    listService: 'メニュー',
+    listResource: 'リソース',
+    listService: 'サービス',
     listStatus: 'ステータス',
     listEmpty: '指定された日付の予約はありません',
 
-    groupedAppointment: 'セット予約',
+    groupedAppointment: 'グループ予約',
     unknownClient: '不明',
     reserved: '予約済み',
     multipleResources: '（{count}名）',

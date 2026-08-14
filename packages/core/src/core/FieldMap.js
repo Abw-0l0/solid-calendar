@@ -60,7 +60,7 @@ const FIELD_KINDS = {
 export const DEFAULT_FIELD_MAP = Object.freeze({
     dataset: Object.freeze({
         resources: ['resources', 'assignees'],
-        secondaryResources: ['secondaryResources', 'rooms'],
+        secondaryResources: ['secondaryResources'],
         businessHours: ['businessHours'],
         businessOverrides: ['businessOverrides'],
         holidaySettings: ['holidaySettings'],
@@ -85,8 +85,8 @@ export const DEFAULT_FIELD_MAP = Object.freeze({
         color: ['color'],
         closedDays: ['closedDays', 'closed_days'],
         order: ['order'],
-        schedules: ['schedules', 'staffSchedules'],
-        overrides: ['overrides', 'staffOverrides'],
+        schedules: ['schedules'],
+        overrides: ['overrides'],
         systemFlag: ['isSystemResource'],
     }),
     secondaryResource: Object.freeze({
@@ -127,6 +127,8 @@ export const HEALTHCARE_FIELD_MAP = Object.freeze({
     resource: Object.freeze({
         name: ['full_name', 'name'],
         color: ['booking_color', 'color'],
+        schedules: ['staffSchedules', 'schedules'],
+        overrides: ['staffOverrides', 'overrides'],
         systemFlag: ['is_system_staff'],
     }),
     client: Object.freeze({ name: ['full_name', 'name'] }),

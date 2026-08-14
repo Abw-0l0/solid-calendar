@@ -185,33 +185,34 @@ export default class CalendarApp {
                 order: f.resource.order(r) ?? 0,
                 schedules: f.resource.schedules(r) ?? [],
                 overrides: f.resource.overrides(r) ?? [],
-                // Holiday-hours policy is a passthrough sub-schema; see docs/DATA-SHAPES.md.
+                // Holiday-hours policy is a passthrough sub-schema, copied through untouched
+                // for BusinessHoursOverlay._resolvePrimaryHolidayHours to interpret.
                 holiday_hours_setting: r.holiday_hours_setting ?? null,
                 holiday_start_time: r.holiday_start_time ?? null,
                 holiday_end_time: r.holiday_end_time ?? null,
                 holiday_hours: r.holiday_hours ?? [],
-                type: RESOURCE_TYPES.STAFF
+                type: RESOURCE_TYPES.PRIMARY
             });
         }
 
         const secondary = f.dataset.secondaryResources(staticData) ?? [];
         for (const r of secondary) {
             resources.push({
-                // Prefixed so a room id cannot collide with a primary-resource id.
-                id: `resource-${f.secondaryResource.id(r)}`,
+                // Prefixed so a secondary id cannot collide with a primary-resource id.
+                id: `secondary-${f.secondaryResource.id(r)}`,
                 title: f.secondaryResource.name(r) ?? '',
                 color: f.secondaryResource.color(r) ?? DEFAULT_NEUTRAL_COLOR,
                 closedDays: [],
                 order: f.secondaryResource.order(r) ?? 0,
-                type: RESOURCE_TYPES.RESOURCE
+                type: RESOURCE_TYPES.SECONDARY
             });
         }
 
         this._warnIfNoResources(staticData, resources);
 
         this.state.setResources(resources);
-        const primaryIds = resources.filter((r) => r.type === RESOURCE_TYPES.STAFF).map((r) => r.id);
-        if (this.state.staffFilters.length === 0) this.state.setStaffFilters(primaryIds);
+        const primaryIds = resources.filter((r) => r.type === RESOURCE_TYPES.PRIMARY).map((r) => r.id);
+        if (this.state.resourceFilters.length === 0) this.state.setResourceFilters(primaryIds);
     }
 
     /**

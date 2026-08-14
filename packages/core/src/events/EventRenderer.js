@@ -40,7 +40,7 @@ export default class EventRenderer {
 
         this._unsubscribers.push(
             this.bus.on('events:loaded', ({ events }) => this.render(events)),
-            this.bus.on('filter:changed', ({ staffIds }) => this._applyFilter(staffIds)),
+            this.bus.on('filter:changed', ({ resourceIds }) => this._applyFilter(resourceIds)),
             this.bus.on('view:changed', () => this._clearAll()),
             this.bus.on('resource:changed', () => this._clearAll()),
             this.bus.on('cardSettings:changed', () => {
@@ -76,8 +76,8 @@ export default class EventRenderer {
         // Mark connected group siblings once every event is positioned
         this._markConnectedSiblings(events);
 
-        // Always apply staff filters after rendering
-        this._applyFilter(this.state.staffFilters);
+        // Always apply resource filters after rendering
+        this._applyFilter(this.state.resourceFilters);
     }
 
     /**
@@ -187,11 +187,11 @@ export default class EventRenderer {
     }
 
     /**
-     * Apply staff filter — hide events not matching the filter
-     * @param {string[]} staffIds - checked staff IDs
+     * Apply the resource filter — hide events not matching it
+     * @param {string[]} resourceIds - checked primary-resource ids
      */
-    _applyFilter(staffIds) {
-        const staffSet = new Set(staffIds.map(String));
+    _applyFilter(resourceIds) {
+        const resourceSet = new Set(resourceIds.map(String));
 
         for (const event of this.state.events) {
             const el = this._elements.get(event.id);
@@ -200,13 +200,13 @@ export default class EventRenderer {
             }
 
             // resourceOwnerId, not resourceId: secondary-resource events carry a
-            // 'resource-' prefix and owner-less time blocks carry a 'no-resource'
+            // 'secondary-' prefix and owner-less time blocks carry a 'no-resource'
             // sentinel, so filtering on resourceId would hide the wrong things.
             const ownerId = event.resourceOwnerId;
             const visible = event.isSecondaryResourceEvent
                 || ownerId == null
                 || event.ignoresResourceFilter
-                || staffSet.has(String(ownerId));
+                || resourceSet.has(String(ownerId));
             el.style.display = visible ? '' : 'none';
         }
     }

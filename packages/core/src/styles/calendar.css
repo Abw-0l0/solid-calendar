@@ -739,16 +739,16 @@
     );
 }
 
-.sc-event--set-menu {
+.sc-event--group {
     background-color: #F3F4F6 !important;
     border-left-color: #9CA3AF;
 }
 
-.sc-event--set-menu .sc-event-content {
+.sc-event--group .sc-event-content {
     color: #374151;
 }
 
-/* Connected siblings indicator — visual link between adjacent set menu events */
+/* Connected siblings indicator — visual link between adjacent grouped events */
 .sc-event--connected-bottom {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -805,7 +805,7 @@
     white-space: nowrap;
 }
 
-/* Generic text field (non-title, non-time, non-menu) */
+/* Generic text field (non-title, non-time, non-service) */
 .sc-event-field {
     font-size: 9px;
     opacity: 0.7;
@@ -984,16 +984,16 @@
 }
 
 /* ============================================================================
-   Staff Filter
+   Resource Filter
    ============================================================================ */
 
-.sc-staff-filter {
+.sc-resource-filter {
     max-height: 300px;
     overflow-y: auto;
     padding: 8px 0;
 }
 
-.sc-staff-filter-item {
+.sc-resource-filter-item {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1002,11 +1002,11 @@
     font-size: var(--sc-font-size-sm);
 }
 
-.sc-staff-filter-item:hover {
+.sc-resource-filter-item:hover {
     background: var(--sc-bg-alt);
 }
 
-.sc-staff-filter-item > span:last-child {
+.sc-resource-filter-item > span:last-child {
     flex: 1;
     min-width: 0;
     overflow: hidden;
@@ -1015,11 +1015,11 @@
     text-align: left;
 }
 
-.sc-staff-filter-item--draggable {
+.sc-resource-filter-item--draggable {
     cursor: grab;
 }
 
-.sc-staff-filter-item--draggable:active {
+.sc-resource-filter-item--draggable:active {
     cursor: grabbing;
 }
 

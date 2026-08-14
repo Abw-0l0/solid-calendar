@@ -52,9 +52,30 @@ describe('translate', () => {
         expect(missing).toEqual([]);
     });
 
+    // Keys are as public as values — a host overrides translations *by key*, so a key
+    // named for one industry is just as much a leak as a string. Scanning values alone is
+    // why `staffDisplay` and `staff` survived the 0.2.0 generalisation.
+    const DOMAIN_WORDS = ['patient', 'therapist', 'clinic', 'menu', 'staff', 'equipment'];
+
     it('should_carry_no_domain_vocabulary_in_the_english_defaults', () => {
         const flat = Object.values(DEFAULT_TRANSLATIONS).join(' ').toLowerCase();
-        for (const word of ['patient', 'therapist', 'clinic', 'menu']) {
+        for (const word of DOMAIN_WORDS) {
+            expect(flat).not.toContain(word);
+        }
+    });
+
+    it('should_carry_no_domain_vocabulary_in_any_translation_key', () => {
+        const keys = Object.keys(DEFAULT_TRANSLATIONS).join(' ').toLowerCase();
+        for (const word of DOMAIN_WORDS) {
+            expect(keys).not.toContain(word);
+        }
+    });
+
+    it('should_carry_no_domain_vocabulary_in_the_japanese_defaults', () => {
+        // The Japanese values had outlived their English counterparts: listResource read
+        // "スタッフ" and listService read "メニュー" long after both keys went generic.
+        const flat = Object.values(JA_TRANSLATIONS).join(' ');
+        for (const word of ['スタッフ', 'メニュー', '患者']) {
             expect(flat).not.toContain(word);
         }
     });
@@ -96,7 +117,7 @@ describe('translations in the rendered calendar', () => {
         await settle();
 
         const headers = [...el.querySelectorAll('.sc-list th')].map((th) => th.textContent);
-        expect(headers).toEqual(['時間', '顧客', 'スタッフ', 'メニュー', 'ステータス']);
+        expect(headers).toEqual(['時間', '顧客', 'リソース', 'サービス', 'ステータス']);
     });
 
     it('should_accept_a_language_the_library_has_never_heard_of', async () => {

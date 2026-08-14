@@ -23,8 +23,8 @@ export interface DateRange { start: string; end: string; }
 export interface CalendarPreferences {
     viewType?: string;
     date?: string;
-    staffFilters?: string[];
-    resourceView?: string;
+    resourceFilters?: string[];
+    resourceMode?: ResourceMode;
 }
 
 export interface CardDisplaySettings {
@@ -131,7 +131,7 @@ export interface CalendarResource {
     /** Weekday numbers (0 = Sunday) or names ('Monday'); both are matched. */
     closedDays?: Array<number | string>;
     order?: number;
-    type: 'staff' | 'resource';
+    type: ResourceType;
     schedules?: any[];
     overrides?: any[];
     holiday_hours_setting?: string | null;
@@ -262,10 +262,11 @@ export class CalendarState {
     constructor(bus: EventBus);
     readonly currentDate: string;
     readonly currentView: string;
-    readonly currentResourceMode: string;
+    readonly currentResourceMode: ResourceMode;
     readonly resources: CalendarResource[];
     readonly events: InternalEvent[];
-    readonly staffFilters: string[];
+    /** Ids of the primary resources currently shown. Secondary resources are not filterable. */
+    readonly resourceFilters: string[];
     readonly privacyMode: boolean;
     readonly isLoading: boolean;
     readonly businessHours: Record<number, BusinessHoursEntry>;
@@ -279,10 +280,10 @@ export class CalendarState {
     readonly lastInteractionEndTime: number;
     setCurrentDate(date: string): void;
     setCurrentView(view: string): void;
-    setCurrentResourceMode(mode: string): void;
+    setCurrentResourceMode(mode: ResourceMode): void;
     setResources(resources: CalendarResource[]): void;
     setEvents(events: InternalEvent[]): void;
-    setStaffFilters(staffIds: string[]): void;
+    setResourceFilters(resourceIds: string[]): void;
     setPrivacyMode(enabled: boolean): void;
     setLoading(loading: boolean): void;
     setBusinessHours(hours: Record<number, BusinessHoursEntry>): void;
@@ -339,10 +340,16 @@ export const DEFAULT_BUSINESS_HOURS: { start: string; end: string };
 export const DEFAULT_RESOURCE_COLOR: string;
 export const DEFAULT_NEUTRAL_COLOR: string;
 export const VIEW_TYPES: Record<string, { duration: string; isResource: boolean; label: string }>;
-export const RESOURCE_MODES: Record<string, { label: string; type: string }>;
-export const RESOURCE_TYPES: { STAFF: 'staff'; RESOURCE: 'resource' };
+/** Resource mode names, which are also preference values and translation keys. */
+export type ResourceMode = 'primaryView' | 'secondaryView' | 'integratedView' | 'flatView';
+
+/** Which tier a resource belongs to: one column each, or additionally occupied. */
+export type ResourceType = 'primary' | 'secondary';
+
+export const RESOURCE_MODES: Record<ResourceMode, { label: string; type: 'primary' | 'secondary' | 'both' | 'flat' }>;
+export const RESOURCE_TYPES: { PRIMARY: 'primary'; SECONDARY: 'secondary' };
 export const DURATION_DAYS: Record<string, number>;
-export const DEFAULTS: { view: string; resourceMode: string; privacyMode: boolean };
+export const DEFAULTS: { view: string; resourceMode: ResourceMode; privacyMode: boolean };
 export function isResourceView(viewType: string): boolean;
 /** True when the mode shows date columns rather than one column per resource. */
 export function isFlatMode(mode: string): boolean;

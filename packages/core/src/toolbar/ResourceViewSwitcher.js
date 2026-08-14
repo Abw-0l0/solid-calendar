@@ -1,8 +1,8 @@
 /**
- * ResourceViewSwitcher — Resource mode dropdown (Staff, Machine, Integrated, Reservation)
+ * ResourceViewSwitcher — Resource mode dropdown (Primary, Secondary, Integrated, Flat)
  *
  * Only visible when the current view is a resource view.
- * Switches between staff, resource, integrated, and flat resource modes.
+ * Switches between primary, secondary, integrated, and flat resource modes.
  */
 import { translate } from '../core/Translations.js';
 import { RESOURCE_MODES, VIEW_TYPES, isFlatMode } from '../core/CalendarConfig.js';
@@ -50,7 +50,7 @@ export default class ResourceViewSwitcher {
         // Build dropdown items
         for (const [key, def] of Object.entries(RESOURCE_MODES)) {
             const item = document.createElement('div');
-            item.className = 'sc-dropdown-item resources-dropdown-item';
+            item.className = 'sc-dropdown-item';
             item.dataset.mode = key;
             item.setAttribute('role', 'option');
             item.textContent = this.config.translations?.[key] ?? def.label;
@@ -110,8 +110,8 @@ export default class ResourceViewSwitcher {
         const viewDef = VIEW_TYPES[currentView];
         if (!viewDef) return;
 
-        const isReservation = isFlatMode(mode);
-        const needsResource = !isReservation;
+        const isFlat = isFlatMode(mode);
+        const needsResource = !isFlat;
         const currentlyResource = viewDef.isResource;
 
         if (needsResource === currentlyResource) return;
@@ -156,7 +156,7 @@ export default class ResourceViewSwitcher {
 
     /**
      * Always visible — user must be able to switch resource mode from any view.
-     * In Month/List views, lock dropdown to Reservation only (no resource columns).
+     * In Month/List views, lock the dropdown to flat mode only (no resource columns).
      */
     _updateVisibility() {
         if (!this._wrapper) {
@@ -167,7 +167,7 @@ export default class ResourceViewSwitcher {
         const view = this.state.currentView;
         const isNonResourceOnly = view === 'dayGridMonth' || view === 'list';
 
-        // Hide non-Reservation items and disable toggle in Month/List views
+        // Hide non-flat items and disable toggle in Month/List views
         const items = this._dropdown.querySelectorAll('.sc-dropdown-item');
         for (const item of items) {
             item.style.display = (isNonResourceOnly && !isFlatMode(item.dataset.mode)) ? 'none' : '';

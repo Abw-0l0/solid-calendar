@@ -23,13 +23,25 @@ export const VIEW_TYPES = {
     list: { duration: 'week', isResource: false, label: 'List' }
 };
 
-/** Canonical resource type values, as written by CalendarApp._buildResources */
-export const RESOURCE_TYPES = { STAFF: 'staff', RESOURCE: 'resource' };
+/**
+ * Canonical resource type values, as written by CalendarApp._buildResources.
+ *
+ * The two tiers are named by their role, not by what they hold: PRIMARY is whatever gets
+ * one column each (a person, a machine, a bay), SECONDARY is what a booking additionally
+ * occupies (a room, a device). `resource` remains the umbrella word for both.
+ */
+export const RESOURCE_TYPES = { PRIMARY: 'primary', SECONDARY: 'secondary' };
 
-/** Resource mode definitions */
+/**
+ * Resource mode definitions.
+ *
+ * Each key is load-bearing three times over: it is the persisted preference value, the
+ * `data-mode` attribute, and the translation key ResourceViewSwitcher looks up. `label` is
+ * only the fallback when no translation is supplied.
+ */
 export const RESOURCE_MODES = {
-    staffView: { label: 'Staff', type: 'staff' },
-    resourceView: { label: 'Resource', type: 'resource' },
+    primaryView: { label: 'Primary', type: 'primary' },
+    secondaryView: { label: 'Secondary', type: 'secondary' },
     integratedView: { label: 'Integrated', type: 'both' },
     flatView: { label: 'Flat', type: 'flat' }
 };
@@ -44,7 +56,7 @@ export const DURATION_DAYS = {
 /** Default state values */
 export const DEFAULTS = {
     view: 'resourceTimeGridDay',
-    resourceMode: 'staffView',
+    resourceMode: 'primaryView',
     privacyMode: false
 };
 
@@ -54,7 +66,7 @@ export const SLOT_HEIGHT = 12;
 /** Minimum event height in pixels */
 export const MIN_EVENT_HEIGHT = 20;
 
-/** Fallback colour for a resource or appointment that supplies none. */
+/** Fallback colour for a resource or event that supplies none. */
 export const DEFAULT_RESOURCE_COLOR = '#6B73FF';
 
 /** Fallback colour for time blocks and secondary resources — deliberately neutral. */

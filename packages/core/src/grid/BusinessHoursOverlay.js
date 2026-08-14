@@ -114,16 +114,16 @@ export default class BusinessHoursOverlay {
     /**
      * Resolve business hours for a resource on the given day and date.
      *
-     * Priority for staff resources:
-     *   1. Staff override for specific date (highest)
-     *   2. Closed day check (staff closed on this weekday)
-     *   3. Public holiday handling (per staff holiday settings)
-     *   4. Regular staff schedule
+     * Priority for primary resources:
+     *   1. Resource override for specific date (highest)
+     *   2. Closed day check (resource closed on this weekday)
+     *   3. Public holiday handling (per resource holiday settings)
+     *   4. Regular resource schedule
      *   5. Business override for specific date
      *   6. Business regular hours (fallback)
-     *   7. Intersect staff hours with business hours
+     *   7. Intersect resource hours with business hours
      *
-     * Equipment resources always use business hours.
+     * Secondary resources always use business hours.
      *
      * @param {object|null} resource
      * @param {string} dayName - e.g. 'Monday'
@@ -135,25 +135,25 @@ export default class BusinessHoursOverlay {
         // Resolve business hours for this date (with overrides and holidays)
         const businessHours = this._resolveBusinessHours(dayOfWeek, columnDate);
 
-        // Equipment resources or no resource: use business hours
-        if (!resource || resource.type === RESOURCE_TYPES.RESOURCE) {
+        // Secondary resources or no resource: use business hours
+        if (!resource || resource.type === RESOURCE_TYPES.SECONDARY) {
             return businessHours;
         }
 
-        // --- Staff resource resolution ---
+        // --- Primary resource resolution ---
 
-        // 1. Staff override for specific date
-        const staffOverride = this._findStaffOverride(resource, columnDate);
-        if (staffOverride) {
-            if (staffOverride.type === 'closed') {
+        // 1. Resource override for specific date
+        const resourceOverride = this._findResourceOverride(resource, columnDate);
+        if (resourceOverride) {
+            if (resourceOverride.type === 'closed') {
                 return null; // entire column grayed out
             }
-            if (staffOverride.type === 'open' && staffOverride.start_time && staffOverride.end_time) {
-                const staffHours = [{
-                    start: staffOverride.start_time.slice(0, 5),
-                    end: staffOverride.end_time.slice(0, 5)
+            if (resourceOverride.type === 'open' && resourceOverride.start_time && resourceOverride.end_time) {
+                const resourceHours = [{
+                    start: resourceOverride.start_time.slice(0, 5),
+                    end: resourceOverride.end_time.slice(0, 5)
                 }];
-                return this._intersectWithBusiness(staffHours, businessHours);
+                return this._intersectWithBusiness(resourceHours, businessHours);
             }
         }
 
@@ -165,7 +165,7 @@ export default class BusinessHoursOverlay {
 
         // 3. Public holiday handling
         if (isHoliday(columnDate, this.state, this.config)) {
-            const holidayResult = this._resolveStaffHolidayHours(resource, columnDate);
+            const holidayResult = this._resolvePrimaryHolidayHours(resource, columnDate);
             if (holidayResult !== undefined) {
                 // null = closed, array = custom hours
                 if (holidayResult === null) {
@@ -176,7 +176,7 @@ export default class BusinessHoursOverlay {
             // undefined = 'normal', fall through to regular schedule
         }
 
-        // 4. Regular staff schedule
+        // 4. Regular resource schedule
         if (resource.schedules?.length) {
             const daySchedules = resource.schedules.filter(
                 (s) => s.day_of_week === dayName
@@ -191,12 +191,12 @@ export default class BusinessHoursOverlay {
                     if (s < start) start = s;
                     if (e > end) end = e;
                 }
-                const staffHours = [{ start: start.slice(0, 5), end: end.slice(0, 5) }];
-                return this._intersectWithBusiness(staffHours, businessHours);
+                const resourceHours = [{ start: start.slice(0, 5), end: end.slice(0, 5) }];
+                return this._intersectWithBusiness(resourceHours, businessHours);
             }
         }
 
-        // 5/6. No staff schedule — fallback to business hours
+        // 5/6. No resource schedule — fallback to business hours
         return businessHours;
     }
 
@@ -259,12 +259,12 @@ export default class BusinessHoursOverlay {
     }
 
     /**
-     * Find a staff override matching the given date.
+     * Find a resource override matching the given date.
      * @param {object} resource
      * @param {string} dateStr - 'YYYY-MM-DD'
      * @returns {object|null}
      */
-    _findStaffOverride(resource, dateStr) {
+    _findResourceOverride(resource, dateStr) {
         const overrides = resource.overrides;
         if (!overrides?.length) {
             return null;
@@ -311,27 +311,26 @@ export default class BusinessHoursOverlay {
     }
 
     /**
-     * Resolve staff holiday hours based on staff's holiday_hours_setting.
-     * Follows v1 resolveStaffHolidaySettings pattern.
+     * Resolve holiday hours from the resource's holiday_hours_setting.
      * @param {object} resource
      * @param {string} columnDate
      * @returns {Array<{start: string, end: string}>|null|undefined}
      *   null = closed, array = custom hours, undefined = use normal schedule
      */
-    _resolveStaffHolidayHours(resource, _columnDate) {
-        const staffSetting = resource.holiday_hours_setting;
+    _resolvePrimaryHolidayHours(resource, _columnDate) {
+        const resourceSetting = resource.holiday_hours_setting;
 
-        // If staff has no setting or says 'follow', use business holiday settings
-        if (!staffSetting || staffSetting === 'follow') {
+        // No setting, or 'follow': use the business holiday settings
+        if (!resourceSetting || resourceSetting === 'follow') {
             const businessResult = this._resolveBusinessHolidayHours();
             return businessResult;
         }
 
-        if (staffSetting === 'closed') {
+        if (resourceSetting === 'closed') {
             return null;
         }
 
-        if (staffSetting === 'custom') {
+        if (resourceSetting === 'custom') {
             const ranges = resource.holiday_hours?.length > 0
                 ? resource.holiday_hours
                 : (resource.holiday_start_time && resource.holiday_end_time
@@ -350,32 +349,32 @@ export default class BusinessHoursOverlay {
     }
 
     /**
-     * Intersect staff hours with business hours.
-     * Staff hours cannot extend beyond business hours.
-     * @param {Array<{start: string, end: string}>} staffHours
+     * Intersect resource hours with business hours.
+     * Resource hours cannot extend beyond business hours.
+     * @param {Array<{start: string, end: string}>} resourceHours
      * @param {Array<{start: string, end: string}>|null} businessHours
      * @returns {Array<{start: string, end: string}>|null}
      */
-    _intersectWithBusiness(staffHours, businessHours) {
+    _intersectWithBusiness(resourceHours, businessHours) {
         if (!businessHours || businessHours.length === 0) {
-            // Business is closed — staff can't work
+            // Business is closed — the resource cannot work
             return null;
         }
-        if (!staffHours || staffHours.length === 0) {
+        if (!resourceHours || resourceHours.length === 0) {
             return businessHours;
         }
 
         const result = [];
-        for (const staffSlot of staffHours) {
-            const staffStart = convertTimeToMinutes(staffSlot.start);
-            const staffEnd = convertTimeToMinutes(staffSlot.end);
+        for (const resourceSlot of resourceHours) {
+            const resourceStart = convertTimeToMinutes(resourceSlot.start);
+            const resourceEnd = convertTimeToMinutes(resourceSlot.end);
 
             for (const businessSlot of businessHours) {
                 const businessStart = convertTimeToMinutes(businessSlot.start);
                 const businessEnd = convertTimeToMinutes(businessSlot.end);
 
-                const intersectionStart = Math.max(staffStart, businessStart);
-                const intersectionEnd = Math.min(staffEnd, businessEnd);
+                const intersectionStart = Math.max(resourceStart, businessStart);
+                const intersectionEnd = Math.min(resourceEnd, businessEnd);
 
                 if (intersectionStart < intersectionEnd) {
                     result.push({

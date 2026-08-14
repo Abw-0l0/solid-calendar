@@ -28,7 +28,7 @@ const calendar = new CalendarApp({
         await fetch(`/api/reservations/${event.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ date, start_time: startTime, staff_id: resourceId }),
+          body: JSON.stringify({ date, start_time: startTime, assignee_id: resourceId }),
         });
       },
 
@@ -42,7 +42,7 @@ const calendar = new CalendarApp({
 
       // Reject a move before it is written. Returning false reverts the element.
       canDrop(event, { newResourceId }) {
-        return event.sourceData.service?.staff_ids?.includes(newResourceId) ?? true;
+        return event.sourceData.service?.assignee_ids?.includes(newResourceId) ?? true;
       },
 
       onError(error, event, revert) {

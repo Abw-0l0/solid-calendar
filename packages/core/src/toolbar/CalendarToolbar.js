@@ -3,13 +3,13 @@
  *
  * Creates the .sc-toolbar container and composes all sub-modules
  * in order: DateNavigation | spacer | ViewSwitcher | ResourceViewSwitcher |
- * StaffFilter | PrivacyToggle | ActionButtons.
+ * ResourceFilter | PrivacyToggle | ActionButtons.
  */
 import { createTranslator } from '../core/Translations.js';
 import DateNavigation from './DateNavigation.js';
 import ViewSwitcher from './ViewSwitcher.js';
 import ResourceViewSwitcher from './ResourceViewSwitcher.js';
-import StaffFilter from './StaffFilter.js';
+import ResourceFilter from './ResourceFilter.js';
 import PrivacyToggle from './PrivacyToggle.js';
 import ActionButtons from './ActionButtons.js';
 
@@ -29,7 +29,7 @@ export default class CalendarToolbar {
         this._dateNavigation = new DateNavigation(state, bus, config);
         this._viewSwitcher = new ViewSwitcher(state, bus, config);
         this._resourceViewSwitcher = new ResourceViewSwitcher(state, bus, config);
-        this._staffFilter = new StaffFilter(state, bus, config);
+        this._resourceFilter = new ResourceFilter(state, bus, config);
         this._privacyToggle = new PrivacyToggle(state, bus, config);
         this._actionButtons = new ActionButtons(state, bus, config);
     }
@@ -53,7 +53,7 @@ export default class CalendarToolbar {
         const existingHeading = container.querySelector('h2.sc-heading');
         const heading = existingHeading || document.createElement('h2');
         heading.className = 'sc-heading';
-        heading.textContent = this._t('Reservations');
+        heading.textContent = this._t('schedule');
         leftGroup.appendChild(heading);
 
         this._dateNavigation.init(leftGroup);
@@ -64,12 +64,12 @@ export default class CalendarToolbar {
         spacer.className = 'sc-toolbar-spacer';
         this.container.appendChild(spacer);
 
-        // Right group: ViewSwitcher + ResourceViewSwitcher + StaffFilter + PrivacyToggle + ActionButtons
+        // Right group: ViewSwitcher + ResourceViewSwitcher + ResourceFilter + PrivacyToggle + ActionButtons
         const rightGroup = document.createElement('div');
         rightGroup.className = 'sc-toolbar-group';
         this._viewSwitcher.init(rightGroup);
         this._resourceViewSwitcher.init(rightGroup);
-        this._staffFilter.init(rightGroup);
+        this._resourceFilter.init(rightGroup);
         this._privacyToggle.init(rightGroup);
         this._actionButtons.init(rightGroup);
         this.container.appendChild(rightGroup);
@@ -85,7 +85,7 @@ export default class CalendarToolbar {
         this._dateNavigation.destroy();
         this._viewSwitcher.destroy();
         this._resourceViewSwitcher.destroy();
-        this._staffFilter.destroy();
+        this._resourceFilter.destroy();
         this._privacyToggle.destroy();
         this._actionButtons.destroy();
         this.container?.remove();

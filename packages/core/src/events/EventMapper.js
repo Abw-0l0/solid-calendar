@@ -4,7 +4,7 @@
  * Together with CalendarApp._buildResources this is one of only two places that read
  * raw incoming field names, and it does so through the compiled field map rather than
  * hardcoding them. Everything downstream reads the normalised shape. That boundary is
- * what stops raw-shape knowledge leaking into renderers, which is how the staff filter,
+ * what stops raw-shape knowledge leaking into renderers, which is how the resource filter,
  * the ListView columns and the event-card service line all came to read fields nothing
  * ever wrote. tests/graph.test.js enforces it.
  */
@@ -44,7 +44,7 @@ export default class EventMapper {
             if (isTimeBlock) {
                 this._mapTimeBlock(raw, resourceOwner, isResourceView, isCancelled, events);
             } else if (this._ownerId(resourceOwner) != null) {
-                this._mapAppointment(raw, resourceOwner, client, isCancelled, events);
+                this._mapEvent(raw, resourceOwner, client, isCancelled, events);
             }
 
             const secondaryResources = f.event.secondaryResources(raw) ?? [];
@@ -112,7 +112,7 @@ export default class EventMapper {
         return ` ${translate(this.config.translations, 'multipleResources', { count })}`;
     }
 
-    _mapAppointment(raw, resourceOwner, client, isCancelled, events) {
+    _mapEvent(raw, resourceOwner, client, isCancelled, events) {
         const clientName = this._clientName(client);
         const service = this.fields.event.service(raw) ?? null;
         const serviceName = (service ? this.fields.service.name(service) : '') ?? '';
@@ -140,7 +140,7 @@ export default class EventMapper {
                 ? blockTitle
                 : (f.client.name(client ?? {}) ?? translate(this.config.translations, 'reserved'));
             events.push(this._createEvent(raw, {
-                title, resourceId: `resource-${f.secondaryResource.id(resource)}`, resourceOwner,
+                title, resourceId: `secondary-${f.secondaryResource.id(resource)}`, resourceOwner,
                 color: f.secondaryResource.color(resource) ?? DEFAULT_NEUTRAL_COLOR,
                 isTimeBlock, isCancelled,
                 isSecondaryResourceEvent: true
