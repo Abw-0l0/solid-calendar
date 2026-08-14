@@ -1,0 +1,115 @@
+name: Release
+
+# Tag-triggered. Everything CI checks runs again here before anything is published,
+# because a tag can be pushed from a branch CI never saw.
+on:
+  push:
+    tags: ['v*']
+  # Lets a release be re-run later — e.g. after fixing credentials — without moving
+  # the tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release, e.g. v0.3.0'
+        required: true
+      publish:
+        description: 'Publish to npm'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.value }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check:imports
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+      - run: npm run test:smoke
+      - run: node scripts/verify-pack.js
+
+      - name: Tag must match both package versions
+        id: version
+        run: |
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          TAG="${TAG#v}"
+          CORE=$(node -p "require('./packages/core/package.json').version")
+          PRO=$(node -p "require('./packages/pro/package.json').version")
+          echo "tag=$TAG core=$CORE pro=$PRO"
+          test "$TAG" = "$CORE" || { echo "::error::tag $TAG does not match core $CORE"; exit 1; }
+          test "$TAG" = "$PRO"  || { echo "::error::tag $TAG does not match pro $PRO"; exit 1; }
+          echo "value=$TAG" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      # Required for npm provenance, which links the published tarball to this run.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      # Node 22 ships npm 10, which predates OIDC support. Trusted publishing needs
+      # 11.5.1+, and without this the publish silently falls back to token auth — or
+      # fails outright once the token is gone.
+      - name: Use an npm that supports OIDC
+        run: npm install -g npm@latest
+
+      - run: npm ci
+      - run: npm run build
+
+      # Deliberately NOT gated on NPM_TOKEN existing. Under trusted publishing there is
+      # no token at all, so a presence check would skip publishing and still report the
+      # release as successful — silently shipping nothing. Failing loudly is correct:
+      # a tag was pushed, so a publish was intended.
+      #
+      # NODE_AUTH_TOKEN is passed through when set. npm tries OIDC first and falls back
+      # to the token, so this works under either arrangement and can be dropped entirely
+      # once trusted publishing is configured.
+      #
+      # Order matters: pro declares core as a peer dependency.
+      - name: Publish solidcalendar
+        if: github.event_name == 'push' || inputs.publish
+        run: npm publish --provenance --access public -w packages/core
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish solidcalendar-pro
+        if: github.event_name == 'push' || inputs.publish
+        run: npm publish --provenance --access public -w packages/pro
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Only reached when the publishes above succeeded, so the wording is safe.
+      - name: Create the GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          generate_release_notes: true
+          body: |
+            `solidcalendar@${{ needs.verify.outputs.version }}` and
+            `solidcalendar-pro@${{ needs.verify.outputs.version }}` are on npm.
+
+            See [CHANGELOG.md](https://github.com/Abw-0l0/solid-calendar/blob/main/CHANGELOG.md).

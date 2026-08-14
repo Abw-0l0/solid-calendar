@@ -1,0 +1,79 @@
+{
+  "name": "solidcalendar",
+  "version": "0.3.0",
+  "description": "High-performance resource scheduling calendar — vanilla JS, zero-dependency rendering",
+  "type": "module",
+  "main": "./dist/calendar.cjs",
+  "module": "./dist/calendar.esm.js",
+  "unpkg": "./dist/calendar.global.min.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/calendar.esm.js",
+      "require": "./dist/calendar.cjs",
+      "default": "./dist/calendar.esm.js"
+    },
+    "./styles": "./dist/calendar.css",
+    "./package.json": "./package.json",
+    "./headless": {
+      "types": "./types/headless.d.ts",
+      "import": "./dist/calendar.headless.esm.js",
+      "default": "./dist/calendar.headless.esm.js"
+    }
+  },
+  "files": [
+    "dist",
+    "types",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "build:watch": "node build.js --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/",
+    "prepublishOnly": "npm run build",
+    "size": "node scripts/report-size.js",
+    "check:imports": "node scripts/check-imports.js",
+    "test:smoke": "node scripts/smoke-global.js",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit types/index.d.ts types/headless.d.ts"
+  },
+  "devDependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
+    "esbuild": "^0.28.2",
+    "vitest": "^4.1.10",
+    "jsdom": "^30.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Abdul Basit Iqbal",
+  "license": "MIT",
+  "homepage": "https://github.com/Abw-0l0/solid-calendar#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abw-0l0/solid-calendar.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "calendar",
+    "scheduler",
+    "resource-scheduling",
+    "booking",
+    "appointment",
+    "time-grid",
+    "drag-drop",
+    "vanilla-js"
+  ],
+  "browser": "./dist/calendar.global.min.js",
+  "jsdelivr": "./dist/calendar.global.min.js",
+  "sideEffects": [
+    "*.css"
+  ],
+  "bugs": {
+    "url": "https://github.com/Abw-0l0/solid-calendar/issues"
+  }
+}

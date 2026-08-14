@@ -1,0 +1,154 @@
+# Changelog
+
+All notable changes to this project are documented here.
+This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.3.0] — 2026-08-14
+
+Renamed to **SolidCalendar**. The previous name said nothing about calendars or
+scheduling, so nobody would have found it by searching. Nothing had been published to npm
+yet, so this rename costs no existing user anything — which is exactly why it happened
+before the first release rather than after.
+
+### Changed
+
+- **BREAKING — package names.** The packages are `solidcalendar` and `solidcalendar-pro`.
+  Both are unscoped, so no npm organisation is involved. Subpaths are `solidcalendar/headless`
+  and `solidcalendar/styles`.
+- **BREAKING — the CSS prefix is `sc-`.** Every class and all 42 theming custom properties
+  moved to it. If you styled or themed the calendar, this is the change that affects you.
+  709 replacements, verified one-to-one by both occurrence count and distinct-token count.
+- **BREAKING — the browser global is `window.SolidCalendar`** (`SolidCalendarPro` for the
+  plugins package).
+- **BREAKING — the DOM event is `sc:slot:select`.**
+- **BREAKING — `config.cssPrefix` is removed.** It was advertised as configurable but
+  governed only 3 of roughly 113 class names, so setting it produced three orphan classes
+  with no matching stylesheet rules and left everything else hardcoded. A half-working
+  option is worse than none.
+- **BREAKING** — the environment variable is `SOLIDCALENDAR_TIMEZONE`. `config.timezone`
+  is unaffected and still takes precedence.
+- Console messages are tagged `[SolidCalendar:*]`.
+
+### Fixed
+
+- The plugins package build banner claimed the Elastic License while the package had
+  already been relicensed to MIT.
+
+The GitHub repository moved to `Abw-0l0/solid-calendar`; GitHub redirects the old URL, so
+existing clones and links keep working. Unchanged: the git history, and the `v0.2.0` tag and
+release. Artifact filenames stay `calendar.*` — inside a package called `solidcalendar`,
+`solidcalendar/dist/calendar.esm.js` reads correctly.
+
+## [0.2.0] — 2026-08-11
+
+The release that turns the initial code drop into a library. Nothing was published before this,
+so the breaking changes below have no installed base to disrupt.
+
+### Added
+
+- **`config.fieldMap`** — declare the field names your API uses instead of reshaping your
+  payload. Entities are `dataset`, `event`, `resource`, `secondaryResource`, `client` and
+  `service`; a value is a name, an ordered candidate list, or a function, and names may be
+  dotted paths. `DEFAULT_FIELD_MAP` and `HEALTHCARE_FIELD_MAP` are exported.
+- **`translations` covers every user-visible string**, with `DEFAULT_TRANSLATIONS`,
+  `JA_TRANSLATIONS` and `translate()` exported. Any language now works, including ones the
+  library has never heard of.
+- `config.onPrint`, defaulting to `window.print()`.
+- `blockedStatuses` on `DragPersistencePlugin`.
+- Normalised event fields: `resourceOwnerId`, `resourceOwnerName`, `clientName`,
+  `serviceName`, `groupId`, `ignoresResourceFilter`.
+- `ACCESSIBILITY.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue and PR templates,
+  Dependabot, `.editorconfig`, `.nvmrc`, `.gitattributes`.
+- CI: coverage, Windows and macOS runners, CodeQL, dependency review.
+
+### Changed
+
+- **BREAKING — the default field names are generic.** `therapist`, `patient`, `menu`,
+  `equipment`, `booking_color`, `set_menu_id` and `staff` are no longer read by default.
+  Use `assignee`/`owner`, `client`/`attendee`, `service`, `secondaryResources`, `color`,
+  `groupId`, and `resources`. Existing payloads migrate in one line with
+  `fieldMap: HEALTHCARE_FIELD_MAP`. If nothing resolves, the calendar now logs which names
+  it looked for and which your payload has.
+- **BREAKING — `dataset.resources` means the primary collection.** It previously named the
+  secondary one. An old payload matches neither list and fails visibly rather than binding
+  half of itself.
+- **BREAKING — the resource filter now actually filters.** A stored `staffFilters: []`
+  previously hid nothing and now hides everything.
+- **BREAKING — `packages/pro` is MIT**, relicensed from the Elastic License 2.0.
+- **BREAKING** — removed: `config.appData` (and `facilityUuid`, `contextId`,
+  `staticCalendarData`, `reservationsData`), `config.translationsTwo`,
+  `config.resourceTypes`, `PrintRenderer`, the `DateUtils` namespace,
+  `parseLocalDateAsJSDate`, `BREAKPOINTS`, `CSS_PREFIX`, `getDurationDays`, `getViewDef`,
+  and the 27 FullCalendar compatibility class names.
+- **BREAKING** — `APP_TIMEZONE_DISPLAY` and `VITE_APP_TIMEZONE` are replaced by
+  `SOLIDCALENDAR_TIMEZONE`.
+- **BREAKING** — an unrecognised stored `resourceView` preference is rejected rather than
+  migrated; `reservationData`, `allEquipmentsData` and `allTherapistsData` no longer map.
+- `DragPersistencePlugin` reads the normalised `isCancelled` flag rather than a hardcoded
+  list of raw status strings, so it honours your `statusResolver`. Its resize path now
+  applies the same check as drop.
+- CSS class names dropped the last of the old vocabulary: the `menu` and `equipment`
+  modifiers became `service` and `secondary`. Custom event fields each carry a per-field
+  class, replacing a hardcoded special case for one privileged field id.
+- `formatTimeRange` takes a locale.
+- The `./headless` subpath has its own type declarations.
+
+### Fixed
+
+- **The resource filter never hid anything.** `_applyFilter` read `event.therapist`, a
+  field the mapper never wrote, so the id was always undefined and the guard always true.
+- **The list view's resource and service columns were always blank**, and **the service
+  line never rendered on an event card** — same cause.
+- **A grouped event got its styling or its indicator, never both**: the class was keyed on
+  `set_menu_id` and the indicator on `sourceData.group_id`.
+- **A payload keyed by `uuid` built columns and then dropped every event against them**;
+  resources resolved `id ?? uuid` while events read a bare `id`.
+- **The Japanese minutes counter was appended in every locale**, on every event card.
+- **`locale: 'ja'` produced a half-Japanese UI**: five modules received the value
+  unnormalised. The date picker's Japanese header was unreachable for the same reason.
+- **Closed days expressed as weekday numbers never matched**; only day names were compared.
+- 18 of 46 runtime exports were undeclared, and `./headless` declared `CalendarApp`, which
+  it does not export — TypeScript accepted an import that failed at runtime.
+- **Every Japanese holiday shifted back a day in any negative-UTC-offset zone.**
+  `holiday_jp` stores dates at UTC midnight and `JapaneseHolidayProvider` read them with
+  local getters, so New Year's Day became 31 December, fell outside the year, and the
+  calendar showed one fewer holiday than exist. Caught by CI, not by local testing.
+- `MIN_EVENT_HEIGHT` was exported and separately redeclared, so changing it did nothing.
+- The npm package README still instructed installing a dependency removed a release ago.
+
+## [0.1.0] — unreleased
+
+Initial version. Never published to npm.
+
+### Added
+
+- Continuous integration, `check:imports`, `test:smoke`, and pack verification.
+
+### Changed
+
+- The core has no runtime dependencies. `@js-temporal/polyfill` was a static import and
+  therefore mandatory despite being declared an optional peer dependency; the ~15 Temporal
+  operations used are now implemented on native `Date` and `Intl`. Delivered bytes dropped
+  from 224.8 kB min / 57.8 kB gzip to 26.6 kB / 8.3 kB.
+- `config.timezone` is honoured, defaulting to the system zone rather than a hardcoded
+  `Asia/Tokyo`.
+- `EventBus.emit` snapshots its handler set before dispatching, so a handler subscribing
+  during dispatch is not invoked within that same emit.
+
+### Fixed
+
+- `CalendarApp.init()` renders the calendar. The views, toolbar, event rendering and
+  interaction handlers were present in the source but imported by nothing, so `init()`
+  loaded data and wrote no DOM.
+- Four modules imported `getHoliday`/`getHolidayName` from a module exporting neither, so
+  the entire view tree failed to bundle.
+- Three resource-type vocabularies disagreed, leaving the resource filter dropdown
+  permanently empty and the print legend unpopulated.
+- One click on an empty slot fired `onSlotSelect` twice.
+- Events whose resource had no column rendered under whichever column happened to be first.
+- The toolbar threw at init when `config.translations` was absent.
+- `require('solidcalendar')` returned an empty object, and the advertised `<script>`
+  artifact was an ESM file with a bare import, so it could never load.
+- Root `npm test` failed: `packages/pro` had a test script and no test files.
+
+[0.3.0]: https://github.com/Abw-0l0/solid-calendar/releases/tag/v0.3.0

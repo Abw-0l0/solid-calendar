@@ -1,0 +1,29 @@
+name: Accessibility issue
+description: A barrier for keyboard, screen reader, or other assistive technology
+labels: [accessibility]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please read [ACCESSIBILITY.md](../../blob/main/ACCESSIBILITY.md) first. The
+        calendar is currently pointer-driven and several gaps are already documented
+        there — an issue confirming a known gap is fine, but say which one.
+  - type: textarea
+    id: barrier
+    attributes:
+      label: The barrier
+      description: What you could not do, and how you were trying to do it.
+    validations:
+      required: true
+  - type: input
+    id: at
+    attributes:
+      label: Assistive technology
+      placeholder: "NVDA 2025.1 on Firefox, or keyboard only"
+  - type: textarea
+    id: announced
+    attributes:
+      label: What was announced
+      description: >
+        If you used a screen reader, what it actually said. This is hard to reconstruct
+        second-hand and is the most useful thing you can include.

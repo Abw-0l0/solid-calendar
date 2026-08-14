@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SolidCalendar — example</title>
+
+<!--
+  Manual check for what jsdom cannot tell you: that the grid has real height, the
+  columns line up with the time axis, and the toolbar does not overlap the header.
+
+  Serve from the repo root after `npm run build`, e.g.
+      npx serve .
+  then open /examples/. Opening the file directly with file:// will not work —
+  ES modules require an http origin.
+-->
+<link rel="stylesheet" href="../packages/core/dist/calendar.css">
+<style>
+    body {
+        margin: 0;
+        padding: 16px;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: #fafafa;
+    }
+    /* The calendar claims the height its container gives it. */
+    #calendar { height: calc(100vh - 32px); background: #fff; padding: 0 12px; }
+    #log {
+        position: fixed; right: 16px; bottom: 16px; width: 320px; max-height: 40vh;
+        overflow: auto; background: #111; color: #b7f37e; font: 12px/1.5 ui-monospace, monospace;
+        padding: 10px 12px; border-radius: 6px; white-space: pre-wrap;
+    }
+</style>
+</head>
+<body>
+
+<div id="calendar"></div>
+<div id="log">events will appear here</div>
+
+<script type="module">
+import { CalendarApp } from '../packages/core/dist/calendar.esm.js';
+
+const log = document.querySelector('#log');
+let lines = [];
+const write = (msg) => {
+    lines = [`${new Date().toLocaleTimeString()}  ${msg}`, ...lines].slice(0, 40);
+    log.textContent = lines.join('\n');
+};
+
+const STAFF = [
+    { id: 't1', name: 'Alex Chen', color: '#8935FF' },
+    { id: 't2', name: 'Blake Osei', color: '#007CBE' },
+    { id: 't3', name: 'Corin Vale', color: '#38A169' },
+];
+
+/** A few appointments spread across today, so overlap layout is visible. */
+function seedEvents(startDate) {
+    const slots = [
+        ['t1', '09:00', '09:30', 'J. Ferreira', 'Follow-up'],
+        ['t1', '09:30', '10:30', 'M. Novak', 'Initial consult'],
+        ['t1', '10:00', '10:45', 'P. Adeyemi', 'Overlapping'],
+        ['t2', '09:00', '10:00', 'R. Haugen', 'Studio session'],
+        ['t2', '11:00', '11:40', 'T. Marchetti', 'Review'],
+        ['t3', '13:00', '14:00', 'N. Duarte', 'Consultation'],
+    ];
+    const events = slots.map(([staff, start, end, patient, menu], i) => ({
+        id: `r${i + 1}`,
+        date: startDate,
+        start_time: start,
+        end_time: end,
+        assignee: { id: staff, color: STAFF.find((s) => s.id === staff).color },
+        client: { name: patient },
+        service: { name: menu },
+        status: 'Active',
+    }));
+
+    // An event carrying a title is a time block by default, not an appointment.
+    events.push({
+        id: 'block-1',
+        date: startDate,
+        start_time: '12:00',
+        end_time: '13:00',
+        title: 'Lunch',
+        assignee: { id: 't1' },
+        status: 'Active',
+    });
+
+    return events;
+}
+
+const calendar = new CalendarApp({
+    el: '#calendar',
+    locale: 'en-US',
+
+    translations: {
+        Reservations: 'Studio schedule',
+        today: 'Today',
+        staffDisplay: 'Instructors',
+        staff: 'Instructors',
+        // Resource-mode labels are keyed by mode name.
+        staffView: 'By instructor',
+        resourceView: 'By room',
+        integratedView: 'Everything',
+        flatView: 'By date',
+        selectAll: 'Select all',
+        print: 'Print',
+        addReservation: 'New booking',
+    },
+
+    dataSource: {
+        async fetchResources() {
+            return {
+                resources: STAFF,
+                secondaryResources: [{ id: 'room-a', name: 'Room A', color: '#D69E2E' }],
+                businessHours: [
+                    { day_of_week: 'Monday', start_time: '09:00', end_time: '18:00' },
+                    { day_of_week: 'Tuesday', start_time: '09:00', end_time: '18:00' },
+                    { day_of_week: 'Wednesday', start_time: '09:00', end_time: '18:00' },
+                    { day_of_week: 'Thursday', start_time: '09:00', end_time: '18:00' },
+                    { day_of_week: 'Friday', start_time: '09:00', end_time: '18:00' },
+                    { day_of_week: 'Saturday', start_time: '09:00', end_time: '13:00' },
+                ],
+            };
+        },
+        async fetchEvents({ start }) {
+            return seedEvents(start);
+        },
+    },
+
+    onEventClick(event) { write(`event:click   ${event.id}  ${event.title.split('\n')[0]}`); },
+    onSlotSelect(detail) {
+        write(`slot:select   ${detail.date} ${detail.startTime}${detail.endTime ? `–${detail.endTime}` : ''}` +
+              `${detail.resourceId ? `  (${detail.resourceId})` : ''}`);
+    },
+    onDateHeaderClick(date) { write(`dateHeader:click  ${date}`); },
+});
+
+calendar.bus.on('events:loaded', ({ events }) => write(`events:loaded  ${events.length}`));
+calendar.bus.on('view:changed', ({ view }) => write(`view:changed   ${view}`));
+calendar.bus.on('event:drop', ({ event, newDate, newTime, newResourceId }) => {
+    write(`event:drop     ${event.id} -> ${newDate} ${newTime} ${newResourceId ?? ''}`);
+});
+calendar.bus.on('event:resize', ({ event, newEndTime }) => {
+    write(`event:resize   ${event.id} -> ends ${newEndTime}`);
+});
+
+await calendar.init();
+window.calendar = calendar;   // for poking at from the console
+write('ready — try dragging an event between columns');
+</script>
+
+</body>
+</html>

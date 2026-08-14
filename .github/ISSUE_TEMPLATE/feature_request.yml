@@ -1,0 +1,23 @@
+name: Feature request
+description: Suggest a capability or an API change
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: >
+        The underlying goal, not just the proposed API. There is often an existing
+        route — `fieldMap`, `translations`, `eventTypeResolver`, or composing the
+        exported rendering modules directly.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you have in mind
+      render: javascript
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you tried instead

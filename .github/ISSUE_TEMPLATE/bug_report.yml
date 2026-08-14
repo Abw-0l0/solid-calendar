@@ -1,0 +1,51 @@
+name: Bug report
+description: Something renders wrong, throws, or behaves unexpectedly
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        jsdom has no layout engine, so if the problem is visual, a screenshot is worth
+        more than a description.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: And what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: >
+        The smallest config that shows it. `examples/index.html` is a good starting
+        point to modify. Include your `dataSource` shape and any `fieldMap`.
+      render: javascript
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: "0.2.0, or a commit SHA"
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and OS
+      placeholder: "Chrome 141 on Windows 11"
+  - type: input
+    id: timezone
+    attributes:
+      label: Timezone
+      description: >
+        Date bugs are frequently zone-specific. Your IANA zone, and the `timezone`
+        config value if you set one.
+      placeholder: "Europe/Lisbon"
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      render: text

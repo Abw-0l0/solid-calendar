@@ -1,0 +1,8 @@
+# This repository is authored on Windows; without this, line endings drift into
+# committed files and every diff becomes unreadable.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary

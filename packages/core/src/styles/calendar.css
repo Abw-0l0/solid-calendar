@@ -1,0 +1,1242 @@
+/*
+ * SolidCalendar — Styles
+ * All classes use the sc- prefix to avoid third-party conflicts.
+ * CSS custom properties use the --sc-* namespace.
+ *
+ * The --sc-* properties are a public theming API: override them on your own
+ * container to restyle the calendar without touching this file.
+ */
+
+/* ============================================================================
+   CSS Custom Properties (Design Tokens)
+   ============================================================================ */
+
+:root {
+    /* Colors */
+    --sc-bg: #ffffff;
+    --sc-bg-alt: #f9fafb;
+    --sc-border: #d1d5db;
+    --sc-border-light: #e5e7eb;
+    --sc-text: #1f2937;
+    --sc-text-secondary: #6b7280;
+    --sc-text-muted: #747474;
+    --sc-primary: #3b82f6;
+    --sc-primary-hover: #2563eb;
+    --sc-danger: #ef4444;
+    --sc-success: #10b981;
+    --sc-warning: #f59e0b;
+    --sc-today-bg: #eff6ff;
+    --sc-holiday-color: #ef4444;
+    --sc-saturday-color: #3b82f6;
+    --sc-non-business-bg: rgba(229, 231, 235, 0.5);
+    --sc-now-indicator: #ef4444;
+    --sc-selection-bg: rgba(59, 130, 246, 0.15);
+
+    /* Spacing */
+    --sc-slot-height: 12px;
+    --sc-header-height: 48px;
+    --sc-time-axis-width: 56px;
+    --sc-column-min-width: 120px;
+    --sc-column-header-height: 36px;
+    --sc-column-gap: 1px;
+    --sc-toolbar-gap: 8px;
+
+    /* Typography */
+    --sc-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --sc-font-size-xs: 10px;
+    --sc-font-size-sm: 12px;
+    --sc-font-size-base: 14px;
+
+    /* Shadows */
+    --sc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --sc-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --sc-shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    /* Transitions */
+    --sc-transition-fast: 150ms ease;
+    --sc-transition-normal: 250ms ease;
+
+    /* Z-indices */
+    --sc-z-grid: 1;
+    --sc-z-events: 10;
+    --sc-z-now-indicator: 20;
+    --sc-z-sticky-header: 30;
+    --sc-z-toolbar: 45;
+    --sc-z-dropdown: 50;
+    --sc-z-modal: 100;
+}
+
+/* ============================================================================
+   Base Container
+   ============================================================================ */
+
+.sc-calendar-container {
+    position: relative;
+    font-family: var(--sc-font-family);
+    font-size: var(--sc-font-size-base);
+    color: var(--sc-text);
+    background: var(--sc-bg);
+    min-height: 400px;
+    overflow: hidden;
+}
+
+/* ============================================================================
+   Toolbar
+   ============================================================================ */
+
+.sc-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sc-toolbar-gap);
+    padding: 8px 0;
+    border-bottom: none;
+    z-index: var(--sc-z-toolbar);
+}
+
+/* The toolbar heading previously relied on Tailwind utility classes hard-coded in JS.
+   A library cannot assume the host ships Tailwind, so the styles live here. */
+.sc-heading {
+    margin: 0 8px 0 0;
+    font-size: 24px;
+    font-weight: 700;
+    white-space: nowrap;
+    display: flex;
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .sc-heading { width: fit-content; }
+}
+
+@media (max-width: 381px) {
+    .sc-heading { font-size: 18px; }
+}
+
+/* Visually hidden but readable by assistive technology. Emitted by ActionButtons. */
+.sc-toolbar .sr-only,
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.sc-btn--active {
+    background: var(--sc-primary);
+    color: #fff;
+    border-color: var(--sc-primary);
+}
+.sc-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sc-toolbar-spacer {
+    flex: 1;
+}
+
+.sc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border: 1px solid var(--sc-border);
+    border-radius: 6px;
+    background: var(--sc-bg);
+    color: var(--sc-text);
+    font-size: var(--sc-font-size-sm);
+    cursor: pointer;
+    transition: background var(--sc-transition-fast), border-color var(--sc-transition-fast);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.sc-btn:hover {
+    background: var(--sc-bg-alt);
+    border-color: var(--sc-text-muted);
+}
+
+.sc-btn:active {
+    background: var(--sc-border-light);
+}
+
+.sc-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.sc-btn--primary {
+    background: var(--sc-primary);
+    border-color: var(--sc-primary);
+    color: #ffffff;
+}
+
+.sc-btn--primary:hover {
+    background: var(--sc-primary-hover);
+    border-color: var(--sc-primary-hover);
+}
+
+.sc-btn--icon {
+    padding: 6px;
+    min-width: 32px;
+}
+
+.sc-btn--card-settings {
+    padding: 4px;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+.sc-btn--card-settings:hover {
+    background: var(--sc-bg-alt);
+    border: none;
+}
+
+.sc-title {
+    font-size: var(--sc-font-size-base);
+    font-weight: 600;
+    margin: 0 8px;
+    white-space: nowrap;
+}
+
+/* ============================================================================
+   Dropdown
+   ============================================================================ */
+
+.sc-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: var(--sc-z-dropdown);
+    min-width: 140px;
+    padding: 4px 0;
+    background: var(--sc-bg);
+    border: 1px solid var(--sc-border);
+    border-radius: 8px;
+    box-shadow: var(--sc-shadow-dropdown);
+    display: none;
+}
+
+.sc-dropdown--open {
+    display: block;
+}
+
+.sc-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    cursor: pointer;
+    font-size: var(--sc-font-size-sm);
+    white-space: nowrap;
+    transition: background var(--sc-transition-fast);
+}
+
+.sc-dropdown-item:hover {
+    background: var(--sc-bg-alt);
+}
+
+.sc-dropdown-item--active {
+    font-weight: 600;
+    color: var(--sc-primary);
+}
+
+/* ============================================================================
+   Date Picker (mini calendar dropdown)
+   ============================================================================ */
+
+.sc-title--clickable {
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    transition: color var(--sc-transition-fast);
+}
+
+.sc-title--clickable:hover {
+    color: var(--sc-primary);
+}
+
+.sc-datepicker {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: var(--sc-z-dropdown);
+    display: none;
+    min-width: 280px;
+    padding: 12px;
+    background: var(--sc-bg);
+    border: 1px solid var(--sc-border);
+    border-radius: 8px;
+    box-shadow: var(--sc-shadow-dropdown);
+    margin-top: 4px;
+}
+
+.sc-datepicker.sc-dropdown--open {
+    display: block;
+}
+
+.sc-datepicker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.sc-datepicker-month-year {
+    font-size: var(--sc-font-size-base);
+    font-weight: 700;
+}
+
+.sc-datepicker-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--sc-text);
+    transition: background var(--sc-transition-fast);
+}
+
+.sc-datepicker-nav:hover {
+    background: var(--sc-bg-alt);
+}
+
+.sc-datepicker-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.sc-datepicker-weekday {
+    font-size: var(--sc-font-size-xs);
+    font-weight: 600;
+    color: var(--sc-text-secondary);
+    padding: 4px 0;
+}
+
+.sc-datepicker-weekday--sunday {
+    color: var(--sc-holiday-color);
+}
+
+.sc-datepicker-weekday--saturday {
+    color: var(--sc-saturday-color);
+}
+
+.sc-datepicker-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 8px;
+}
+
+.sc-datepicker-day {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin: 0 auto;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    font-size: var(--sc-font-size-sm);
+    cursor: pointer;
+    color: var(--sc-text);
+    transition: background var(--sc-transition-fast);
+}
+
+.sc-datepicker-day:hover:not(:disabled) {
+    background: var(--sc-bg-alt);
+}
+
+.sc-datepicker-day--selected {
+    background: var(--sc-primary) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.sc-datepicker-day--today:not(.sc-datepicker-day--selected) {
+    background: var(--sc-today-bg);
+    font-weight: 700;
+}
+
+.sc-datepicker-day--sunday {
+    color: var(--sc-holiday-color);
+}
+
+.sc-datepicker-day--sunday.sc-datepicker-day--selected {
+    color: #ffffff;
+}
+
+.sc-datepicker-day--saturday {
+    color: var(--sc-saturday-color);
+}
+
+.sc-datepicker-day--saturday.sc-datepicker-day--selected {
+    color: #ffffff;
+}
+
+.sc-datepicker-day--other {
+    color: var(--sc-text-muted);
+    opacity: 0.4;
+    cursor: default;
+}
+
+.sc-datepicker-today-btn {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    background: var(--sc-primary);
+    color: #ffffff;
+    font-size: var(--sc-font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--sc-transition-fast);
+}
+
+.sc-datepicker-today-btn:hover {
+    background: var(--sc-primary-hover);
+}
+
+/* ============================================================================
+   View Container
+   ============================================================================ */
+
+/* The container is the flex parent so the view can claim the remaining height,
+   rather than subtracting a hard-coded toolbar height. The toolbar wraps on narrow
+   viewports, so any fixed guess pushes the grid off-screen. */
+.sc-calendar-container {
+    display: flex;
+    flex-direction: column;
+    height: var(--sc-container-height, calc(100vh - 120px));
+}
+
+.sc-view {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e6e6e6;
+    border-radius: 6px;
+    overflow: hidden;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: calc(100dvh - 170px);
+}
+
+/* ============================================================================
+   Grid Layout
+   ============================================================================ */
+
+.sc-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    position: relative;
+    overflow-x: auto;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.sc-time-axis {
+    position: sticky;
+    left: 0;
+    z-index: var(--sc-z-sticky-header);
+    width: var(--sc-time-axis-width);
+    min-width: var(--sc-time-axis-width);
+    background: var(--sc-bg);
+    border-right: 1px solid var(--sc-border);
+    padding-top: var(--sc-column-header-height);
+}
+
+/* Grouped mode: time axis needs space for both date group header + column header */
+.sc-grid:has(.sc-date-group) .sc-time-axis {
+    padding-top: calc(var(--sc-column-header-height) * 2);
+}
+
+.sc-time-label {
+    height: calc(var(--sc-slot-height) * 3); /* 30-min label = 3 × 10-min slots */
+    margin-bottom: calc(var(--sc-slot-height) * -3); /* collapse from flow so axis height = slots only */
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding-right: 8px;
+    font-size: var(--sc-font-size-xs);
+    color: var(--sc-text-muted);
+    transform: translateY(5%);
+    position: relative;
+    z-index: 1;
+}
+
+.sc-timeslot {
+    height: var(--sc-slot-height);
+    border-top: 1px solid transparent;
+    box-sizing: border-box;
+}
+
+.sc-timeslot--label {
+    border-top-color: var(--sc-border);
+}
+
+.sc-columns-container {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+}
+
+/* When columns-container has date groups, it scrolls with the grid */
+.sc-columns-container:has(.sc-date-group) {
+    gap: 0;
+}
+
+.sc-column {
+    flex: 1;
+    min-width: var(--sc-column-min-width);
+    border-right: 1px solid var(--sc-border-light);
+}
+
+.sc-column:last-child {
+    border-right: none;
+}
+
+/* ============================================================================
+   Column Headers
+   ============================================================================ */
+
+.sc-column-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--sc-z-sticky-header);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    height: var(--sc-column-header-height);
+    box-sizing: border-box;
+    background: var(--sc-bg);
+    font-size: var(--sc-font-size-sm);
+    font-weight: 600;
+}
+
+.sc-color-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.sc-column-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sc-column-body {
+    position: relative;
+    isolation: isolate;
+    background:
+        /* Hour lines (60-min, every 6 slots) — darker, painted on top */
+        repeating-linear-gradient(
+            to bottom,
+            var(--sc-border) 0,
+            var(--sc-border) 1px,
+            transparent 1px,
+            transparent calc(var(--sc-slot-height) * 6)
+        ),
+        /* Half-hour lines (30-min, every 3 slots) — lighter */
+        repeating-linear-gradient(
+            to bottom,
+            var(--sc-border-light) 0,
+            var(--sc-border-light) 1px,
+            transparent 1px,
+            transparent calc(var(--sc-slot-height) * 3)
+        );
+}
+
+/* ============================================================================
+   Date Headers
+   ============================================================================ */
+
+.sc-date-header {
+    display: flex;
+    gap: var(--sc-column-gap);
+    padding-left: var(--sc-time-axis-width);
+    border-bottom: 1px solid var(--sc-border);
+}
+
+.sc-date-header-cell {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 4px;
+    font-size: var(--sc-font-size-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sc-date-header-text {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sc-date-header-cell--today {
+    background: var(--sc-today-bg);
+    font-weight: 700;
+}
+
+.sc-date-header-cell--holiday {
+    color: var(--sc-holiday-color);
+}
+
+.sc-date-header-cell--saturday {
+    color: var(--sc-saturday-color);
+}
+
+.sc-date-header-day {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.sc-date-header-weekday {
+    font-size: var(--sc-font-size-xs);
+    color: var(--sc-text-secondary);
+}
+
+.sc-date-header-holiday {
+    font-size: var(--sc-font-size-xs);
+    color: var(--sc-holiday-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ============================================================================
+   Date Groups (multi-day resource views)
+   ============================================================================ */
+
+.sc-date-group {
+    display: flex;
+    flex-direction: column;
+    border-right: 1.5px solid var(--sc-border);
+}
+
+.sc-date-group:last-child {
+    border-right: none;
+}
+
+.sc-date-group-header {
+    position: sticky;
+    top: 0;
+    z-index: calc(var(--sc-z-sticky-header) + 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: var(--sc-column-header-height);
+    box-sizing: border-box;
+    background: var(--sc-bg-alt);
+    border-bottom: 1px solid var(--sc-border);
+    font-size: var(--sc-font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.sc-date-group-header--today {
+    background: var(--sc-today-bg);
+}
+
+.sc-date-group-header--holiday {
+    color: var(--sc-holiday-color);
+}
+
+.sc-date-group-header--saturday {
+    color: var(--sc-saturday-color);
+}
+
+.sc-date-group-header-text {
+    font-weight: 600;
+}
+
+.sc-date-group-header-holiday {
+    font-size: var(--sc-font-size-xs);
+    opacity: 0.8;
+}
+
+.sc-date-group-columns {
+    display: flex;
+    flex: 1;
+}
+
+/* In grouped mode, column headers sit below the date group header */
+.sc-date-group .sc-column-header {
+    top: var(--sc-column-header-height);
+}
+
+/* ============================================================================
+   Events
+   ============================================================================ */
+
+.sc-event {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    min-height: var(--sc-slot-height);
+    border-radius: 4px;
+    border-left: 3px solid;
+    padding: 2px 4px;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: var(--sc-z-events);
+    font-size: var(--sc-font-size-xs);
+    line-height: 1.3;
+    transition: box-shadow var(--sc-transition-fast);
+}
+
+.sc-event:hover {
+    box-shadow: var(--sc-shadow-md);
+    z-index: calc(var(--sc-z-events) + 5);
+}
+
+.sc-event--cancelled {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+.sc-event--timeblock {
+    border-left-style: dashed;
+    background-image: repeating-linear-gradient(
+        135deg,
+        transparent,
+        transparent 4px,
+        rgba(0, 0, 0, 0.03) 4px,
+        rgba(0, 0, 0, 0.03) 8px
+    );
+}
+
+.sc-event--set-menu {
+    background-color: #F3F4F6 !important;
+    border-left-color: #9CA3AF;
+}
+
+.sc-event--set-menu .sc-event-content {
+    color: #374151;
+}
+
+/* Connected siblings indicator — visual link between adjacent set menu events */
+.sc-event--connected-bottom {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.sc-event--connected-bottom::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 4px;
+    background: #9CA3AF;
+    z-index: calc(var(--sc-z-events) + 1);
+    pointer-events: none;
+}
+
+.sc-event--connected-top {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.sc-event--dragging {
+    opacity: 0.7;
+    box-shadow: var(--sc-shadow-md);
+    z-index: calc(var(--sc-z-events) + 5);
+}
+
+.sc-event-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    overflow: hidden;
+}
+
+.sc-event-title {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sc-event-time {
+    font-size: 9px;
+    opacity: 0.8;
+}
+
+.sc-event-service {
+    font-size: 9px;
+    opacity: 0.7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Generic text field (non-title, non-time, non-menu) */
+.sc-event-field {
+    font-size: 9px;
+    opacity: 0.7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Badge container */
+.sc-event-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: 1px;
+}
+
+/* Base badge styling */
+.sc-event-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-size: 9px;
+    font-weight: 400;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+/* Filled badge variant (solid background) */
+.sc-event-badge--filled {
+    border: none;
+}
+
+/* Outlined badge variant (border + transparent bg) */
+.sc-event-badge--outlined {
+    border: 1px solid;
+}
+
+/* Icon-only badge variant (no label, just icon) */
+.sc-event-badge--icon-only {
+    padding: 2px 3px;
+}
+
+.sc-event-badge-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sc-event-badge-count {
+    font-size: 9px;
+}
+
+/* Privacy blur — applied to individual suppressed fields/badges */
+.sc-privacy-blur {
+    filter: blur(4px);
+    user-select: none;
+}
+
+.sc-event-resize-handle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    cursor: ns-resize;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.sc-event-resize-handle:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.sc-event-group-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 0 14px 14px 0;
+    border-color: transparent transparent transparent transparent;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* ============================================================================
+   Now Indicator
+   ============================================================================ */
+
+.sc-now-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--sc-now-indicator);
+    z-index: var(--sc-z-now-indicator);
+    pointer-events: none;
+}
+
+.sc-now-indicator::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sc-now-indicator);
+}
+
+/* ============================================================================
+   Business Hours Overlay
+   ============================================================================ */
+
+.sc-non-business {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: var(--sc-non-business-bg);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ============================================================================
+   Selection Mirror
+   ============================================================================ */
+
+.sc-selection-mirror {
+    position: absolute;
+    background: var(--sc-selection-bg);
+    border: 2px dashed var(--sc-primary);
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: calc(var(--sc-z-events) - 1);
+}
+
+/* ============================================================================
+   Loading Overlay
+   ============================================================================ */
+
+.sc-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: var(--sc-z-modal);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--sc-transition-normal);
+}
+
+.sc-loader--visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sc-loader-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--sc-border);
+    border-top-color: var(--sc-primary);
+    border-radius: 50%;
+    animation: sc-spin 0.8s linear infinite;
+}
+
+@keyframes sc-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================================================
+   Staff Filter
+   ============================================================================ */
+
+.sc-staff-filter {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.sc-staff-filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 16px;
+    cursor: pointer;
+    font-size: var(--sc-font-size-sm);
+}
+
+.sc-staff-filter-item:hover {
+    background: var(--sc-bg-alt);
+}
+
+.sc-staff-filter-item > span:last-child {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.sc-staff-filter-item--draggable {
+    cursor: grab;
+}
+
+.sc-staff-filter-item--draggable:active {
+    cursor: grabbing;
+}
+
+/* ============================================================================
+   Privacy Mode
+   ============================================================================ */
+
+.sc-privacy .sc-event-title,
+.sc-privacy .sc-event-service {
+    filter: blur(4px);
+    user-select: none;
+}
+
+/* ============================================================================
+   Month View
+   ============================================================================ */
+
+.sc-month-weekday-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: var(--sc-font-size-sm);
+    font-weight: 600;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--sc-border);
+}
+
+.sc-month-weekday-cell {
+    padding: 4px;
+}
+
+.sc-month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--sc-border-light);
+    border: 1px solid var(--sc-border);
+    height: 80%;
+}
+
+.sc-month-cell {
+    min-height: 100px;
+    padding: 4px;
+    background: var(--sc-bg);
+    min-width: 0;
+    overflow: hidden;
+}
+
+.sc-month-cell--other {
+    background: var(--sc-bg-alt);
+    opacity: 0.5;
+}
+
+.sc-month-cell--today {
+    background: var(--sc-today-bg);
+}
+
+.sc-month-day-number {
+    font-size: var(--sc-font-size-sm);
+    font-weight: 600;
+    padding: 2px 4px;
+}
+
+.sc-month-event {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: var(--sc-font-size-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    margin-bottom: 1px;
+}
+
+.sc-month-event:hover {
+    filter: brightness(0.95);
+}
+
+.sc-month-more {
+    font-size: var(--sc-font-size-xs);
+    color: var(--sc-text-secondary);
+    padding: 1px 4px;
+    cursor: pointer;
+}
+
+/* ============================================================================
+   List View
+   ============================================================================ */
+
+.sc-list {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sc-list-header {
+    position: sticky;
+    top: 0;
+    background: var(--sc-bg-alt);
+    border-bottom: 2px solid var(--sc-border);
+}
+
+.sc-list-header th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: var(--sc-font-size-sm);
+    font-weight: 600;
+    color: var(--sc-text-secondary);
+    background: #ffffff;
+}
+
+.sc-list-day-header {
+    background: #f1f1f1;
+    padding: 8px 12px;
+    font-weight: 600;
+    font-size: var(--sc-font-size-sm);
+    border-bottom: 1px solid var(--sc-border);
+}
+
+.sc-list-row {
+    border-bottom: 1px solid var(--sc-border-light);
+    cursor: pointer;
+    transition: background var(--sc-transition-fast);
+}
+
+.sc-list-row:hover {
+    background: #ffffff;
+}
+
+.sc-list-row td {
+    padding: 8px 12px;
+    font-size: var(--sc-font-size-sm);
+}
+
+.sc-list-empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--sc-text-muted);
+    font-size: var(--sc-font-size-base);
+}
+
+/* ============================================================================
+   Responsive: Mobile (< 380px)
+   ============================================================================ */
+
+@media (max-width: 379px) {
+    .sc-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+    }
+
+    .sc-toolbar-group {
+        justify-content: center;
+    }
+
+    .sc-title {
+        text-align: center;
+        font-size: var(--sc-font-size-sm);
+    }
+
+    .sc-datepicker {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+/* ============================================================================
+   Responsive: Tablet (380px - 600px)
+   ============================================================================ */
+
+@media (min-width: 380px) and (max-width: 600px) {
+    .sc-toolbar {
+        flex-wrap: wrap;
+    }
+}
+
+/* ============================================================================
+   Responsive: Desktop (> 1380px)
+   ============================================================================ */
+
+@media (min-width: 1380px) {
+    .sc-toolbar {
+        flex-wrap: nowrap;
+    }
+}
+
+/* ============================================================================
+   Print Styles
+   ============================================================================ */
+
+@media print {
+    .sc-toolbar,
+    .sc-now-indicator,
+    .sc-event-resize-handle,
+    .sc-loader,
+    .sc-datepicker {
+        display: none !important;
+    }
+
+    .sc-calendar-container {
+        overflow: visible;
+        min-height: auto;
+    }
+
+    .sc-grid {
+        overflow: visible;
+    }
+
+    .sc-event {
+        break-inside: avoid;
+        box-shadow: none;
+    }
+
+    .sc-column-header {
+        position: static;
+    }
+}

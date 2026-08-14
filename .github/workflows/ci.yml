@@ -1,0 +1,178 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # The development toolchain, not the support matrix. The binding constraint is
+        # jsdom 30, which declares ^22.22.2 || ^24.15.0 || >=26 — it dropped Node 20
+        # outright, and it is the test environment for the whole core suite. What the
+        # *published package* supports is a separate question, proved by `consumer`.
+        node: ['22', '24']
+        os: [ubuntu-latest]
+        include:
+          # This repository is authored on Windows and the build scripts touch paths
+          # and shell behaviour; test the platform the code is written on.
+          - node: '22'
+            os: windows-latest
+          - node: '22'
+            os: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+
+      # Resolves every module in src/, not just those reachable from index.js. The
+      # single-entry-point build cannot see a broken import in an unreferenced module.
+      - name: Check imports
+        run: npm run check:imports
+
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+
+      # Loads the advertised <script> artifact in a bare context with no `require`.
+      - name: Smoke-test browser artifact
+        run: npm run test:smoke
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:coverage
+      - uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: packages/core/coverage
+          retention-days: 14
+
+  timezones:
+    # Date logic is timezone- and DST-sensitive; a UTC-only run passes a broken
+    # implementation. Kiritimati (UTC+14) and Santiago (midnight DST shift) are the
+    # two that actually find bugs.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tz:
+          - UTC
+          - Asia/Tokyo
+          - America/New_York
+          - Australia/Sydney
+          - Pacific/Kiritimati
+          - America/Santiago
+    env:
+      TZ: ${{ matrix.tz }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  pack:
+    # Asserts every path in "files", every entry field, and every subpath export is
+    # really in the tarball.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Verify package contents
+        run: node scripts/verify-pack.js
+
+  consumer:
+    # The published package claims Node 18+. The dev toolchain cannot run there at all —
+    # jsdom 30 requires Node 22.22+ — so without this job that claim would be an untested
+    # assertion. Builds on a supported Node, then installs the real tarball on each
+    # supported version and uses it, with no dev dependencies present.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18', '20', '22', '24']
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Pack the tarballs
+        run: |
+          npm pack -w packages/core --pack-destination /tmp
+          npm pack -w packages/pro  --pack-destination /tmp
+
+      - name: Install and use it on Node ${{ matrix.node }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Consume the package
+        run: |
+          mkdir -p /tmp/consumer && cd /tmp/consumer
+          npm init -y >/dev/null
+          npm install /tmp/solidcalendar-*.tgz
+          node --input-type=commonjs -e "
+            const api = require('solidcalendar');
+            if (typeof api.CalendarApp !== 'function') throw new Error('CalendarApp missing from require()');
+            const state = new api.CalendarState({ emit() {}, on() {} });
+            if (!/^\d{4}-\d{2}-\d{2}\$/.test(state.currentDate)) throw new Error('bad currentDate: ' + state.currentDate);
+            console.log('require() ok on node ' + process.version + ' — ' + Object.keys(api).length + ' exports');
+          "
+          node --input-type=module -e "
+            import { temporal, SLOT_INTERVAL } from 'solidcalendar/headless';
+            if (temporal.addMonths('2026-01-31', 1) !== '2026-02-28') throw new Error('month clamping wrong');
+            if (SLOT_INTERVAL !== 10) throw new Error('constant missing');
+            console.log('headless esm ok on node ' + process.version);
+          "
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+      - uses: github/codeql-action/analyze@v4
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/dependency-review-action@v5

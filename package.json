@@ -1,0 +1,42 @@
+{
+  "name": "solidcalendar-monorepo",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "build:core": "npm run build -w packages/core",
+    "build:pro": "npm run build -w packages/pro",
+    "test": "npm run test --workspaces --if-present",
+    "test:core": "npm run test -w packages/core",
+    "lint": "eslint .",
+    "clean": "node -e \"for (const p of [String.raw`packages/core/dist`, String.raw`packages/pro/dist`]) require(String.raw`fs`).rmSync(p, { recursive: true, force: true })\"",
+    "prepublish:check": "npm run build && npm run test",
+    "check:imports": "npm run check:imports --workspaces --if-present",
+    "test:smoke": "npm run test:smoke --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.8.1",
+    "globals": "^17.9.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+  },
+  "description": "Monorepo for SolidCalendar — a dependency-free resource scheduling calendar.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abw-0l0/solid-calendar.git"
+  },
+  "license": "MIT",
+  "author": "Abdul Basit Iqbal",
+  "packageManager": "npm@11.6.2"
+}
