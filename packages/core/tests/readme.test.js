@@ -34,8 +34,8 @@ describe('README examples', () => {
                     async fetchResources() {
                         return {
                             resources: [
-                                { id: 't1', name: 'Dr. Sato', color: '#8935FF' },
-                                { id: 't2', name: 'Dr. Tanaka', color: '#007CBE' },
+                                { id: 't1', name: 'Alex Chen', color: '#8935FF' },
+                                { id: 't2', name: 'Blake Osei', color: '#007CBE' },
                             ],
                         };
                     },
@@ -43,7 +43,7 @@ describe('README examples', () => {
                         // The minimal raw event shape the README documents.
                         return [{
                             id: 'r1', date: TODAY, start_time: '09:00', end_time: '09:30',
-                            assignee: { id: 't1' }, client: { name: 'A. Yamada' },
+                            assignee: { id: 't1' }, client: { name: 'J. Ferreira' },
                             service: { name: 'Follow-up' }, status: 'Active',
                         }];
                     },
@@ -67,11 +67,11 @@ describe('README examples', () => {
             calendar = new CalendarApp({
                 el: '#calendar',
                 dataSource: {
-                    async fetchResources() { return { staff: [{ id: 't1', name: 'Dr. Sato' }] }; },
+                    async fetchResources() { return { resources: [{ id: 't1', name: 'Alex Chen' }] }; },
                     async fetchEvents() {
                         return [
                             { id: 'appt', date: TODAY, start_time: '09:00', end_time: '09:30',
-                              assignee: { id: 't1' }, client: { name: 'A. Yamada' }, status: 'Active' },
+                              assignee: { id: 't1' }, client: { name: 'J. Ferreira' }, status: 'Active' },
                             { id: 'block', date: TODAY, start_time: '12:00', end_time: '13:00',
                               title: 'Lunch', assignee: { id: 't1' }, status: 'Active' },
                         ];
@@ -89,11 +89,11 @@ describe('README examples', () => {
             calendar = new CalendarApp({
                 el: '#calendar',
                 dataSource: {
-                    async fetchResources() { return { staff: [{ id: 't1', name: 'Dr. Sato' }] }; },
+                    async fetchResources() { return { resources: [{ id: 't1', name: 'Alex Chen' }] }; },
                     async fetchEvents() {
-                        // A flat staff_id, which the README warns is silently dropped.
+                        // A flat scalar id under a name the library does not read.
                         return [{ id: 'flat', date: TODAY, start_time: '09:00', end_time: '09:30',
-                                  staff_id: 't1', client: { name: 'A. Yamada' }, status: 'Active' }];
+                                  assignee_id: 't1', client: { name: 'J. Ferreira' }, status: 'Active' }];
                     },
                 },
             });
@@ -121,7 +121,7 @@ describe('README examples', () => {
                 },
                 dataSource: {
                     async fetchResources() {
-                        return { staff: [{ id: 'u7', name: 'Dr. Mori', color: '#38A169' }] };
+                        return { resources: [{ id: 'u7', name: 'Casey Rivera', color: '#38A169' }] };
                     },
                     async fetchEvents() {
                         return [{
@@ -162,7 +162,7 @@ describe('README examples', () => {
             }
 
             const dataSource = {
-                async fetchResources() { return { staff: [{ id: 't1', name: 'Dr. Sato' }] }; },
+                async fetchResources() { return { resources: [{ id: 't1', name: 'Alex Chen' }] }; },
                 async fetchEvents() {
                     return [
                         { id: 'a', date: TODAY, start_time: '09:00', end_time: '09:30',

@@ -128,7 +128,7 @@ describe('a foreign schema through fieldMap', () => {
         app = new CalendarApp({ el: '#calendar', fieldMap: WORKSHOP_FIELD_MAP, dataSource: workshopSource });
         await app.init();
 
-        app.state.setStaffFilters(['m2']);
+        app.state.setResourceFilters(['m2']);
         expect(el.querySelector('.sc-event[data-event-id="wo-1"]').style.display).toBe('none');
     });
 
@@ -178,7 +178,7 @@ describe('the healthcare preset', () => {
             dataSource: {
                 async fetchResources() {
                     return {
-                        therapists: [{ id: 't1', full_name: 'Dr. Sato', booking_color: '#8935FF' }],
+                        therapists: [{ id: 't1', full_name: 'Alex Chen', booking_color: '#8935FF' }],
                         equipment: [{ id: 'e1', name: 'Room A' }],
                     };
                 },
@@ -186,7 +186,7 @@ describe('the healthcare preset', () => {
                     return [{
                         id: 'r1', date: TODAY, start_time: '09:00', end_time: '09:30',
                         therapist: { id: 't1', booking_color: '#8935FF' },
-                        patient: { full_name: 'A. Yamada' },
+                        patient: { full_name: 'J. Ferreira' },
                         menu: { name: 'Follow-up' },
                         set_menu_id: 'sm-1',
                         status: 'Active',
@@ -196,11 +196,11 @@ describe('the healthcare preset', () => {
         });
         await app.init();
 
-        expect(app.state.resources[0].title).toBe('Dr. Sato');
+        expect(app.state.resources[0].title).toBe('Alex Chen');
         expect(app.state.resources[0].color).toBe('#8935FF');
 
         const [event] = app.state.events;
-        expect(event.clientName).toBe('A. Yamada');
+        expect(event.clientName).toBe('J. Ferreira');
         expect(event.serviceName).toBe('Follow-up');
         expect(event.resourceOwnerId).toBe('t1');
         expect(event.groupId).toBe('sm-1');

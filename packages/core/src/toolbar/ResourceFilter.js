@@ -1,13 +1,13 @@
 import { createTranslator } from '../core/Translations.js';
 import { RESOURCE_TYPES } from '../core/CalendarConfig.js';
 /**
- * StaffFilter — Staff checkbox dropdown with drag-to-reorder
+ * ResourceFilter — primary-resource checkbox dropdown with drag-to-reorder
  *
  * Displays the primary resources with checkboxes and colored dots.
  * Supports HTML5 drag-and-drop reordering for column order.
  * Includes a "Select All" toggle to check/uncheck all at once.
  */
-export default class StaffFilter {
+export default class ResourceFilter {
     /**
      * @param {import('../core/CalendarState.js').default} state
      * @param {import('../core/EventBus.js').default} bus
@@ -31,7 +31,7 @@ export default class StaffFilter {
     }
 
     /**
-     * Build staff filter dropdown and mount into container
+     * Build resource filter dropdown and mount into container
      * @param {HTMLElement} container
      */
     init(container) {
@@ -45,13 +45,13 @@ export default class StaffFilter {
         this._triggerBtn = document.createElement('button');
         this._triggerBtn.className = 'sc-btn';
         this._triggerBtn.type = 'button';
-        this._triggerBtn.textContent = this._t('staffDisplay') + ' \u25BE';
+        this._triggerBtn.textContent = this._t('resourceDisplay') + ' ▾';
         this._triggerBtn.setAttribute('aria-haspopup', 'listbox');
         this._triggerBtn.setAttribute('aria-expanded', 'false');
 
         // Dropdown container
         this._dropdown = document.createElement('div');
-        this._dropdown.className = 'sc-dropdown sc-staff-filter';
+        this._dropdown.className = 'sc-dropdown sc-resource-filter';
         this._dropdown.style.minWidth = '194px';
 
         // Header
@@ -60,7 +60,7 @@ export default class StaffFilter {
         header.style.fontWeight = '600';
         header.style.fontSize = '14px';
         header.style.cursor = 'default';
-        header.textContent = this._t('staff');
+        header.textContent = this._t('resources');
 
         this._dropdown.appendChild(header);
 
@@ -80,8 +80,8 @@ export default class StaffFilter {
                 return;
             }
 
-            // Handle clicks anywhere in a staff filter item row
-            const item = e.target.closest('.sc-staff-filter-item');
+            // Handle clicks anywhere in a resource filter item row
+            const item = e.target.closest('.sc-resource-filter-item');
             if (item) {
                 const checkbox = item.querySelector('input[type="checkbox"]');
                 if (checkbox) {
@@ -105,7 +105,7 @@ export default class StaffFilter {
 
         container.appendChild(this._wrapper);
 
-        // Populate staff list
+        // Populate resource list
         this._buildList();
 
         this._unsubs.push(
@@ -117,14 +117,14 @@ export default class StaffFilter {
     }
 
     /**
-     * @returns {Array} staff resources only, excluding rooms and equipment
+     * @returns {Array} primary resources only, excluding secondary ones
      */
-    _staffResources() {
-        return this.state.resources.filter((r) => r.type === RESOURCE_TYPES.STAFF);
+    _primaryResources() {
+        return this.state.resources.filter((r) => r.type === RESOURCE_TYPES.PRIMARY);
     }
 
     /**
-     * Build the staff list items from state.resources
+     * Build the resource list items from state.resources
      */
     _buildList() {
         if (!this._listEl) {
@@ -140,10 +140,10 @@ export default class StaffFilter {
         const selectAllItem = this._createSelectAllItem();
         this._listEl.appendChild(selectAllItem);
 
-        // Staff items
-        const staffResources = this._staffResources();
-        for (const staff of staffResources) {
-            const item = this._createStaffItem(staff);
+        // Resource items
+        const primaryResources = this._primaryResources();
+        for (const resource of primaryResources) {
+            const item = this._createResourceItem(resource);
             this._listEl.appendChild(item);
         }
     }
@@ -154,19 +154,19 @@ export default class StaffFilter {
      */
     _createSelectAllItem() {
         const item = document.createElement('div');
-        item.className = 'sc-staff-filter-item';
-        item.dataset.staffId = 'all';
+        item.className = 'sc-resource-filter-item';
+        item.dataset.resourceId = 'all';
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.value = 'all';
-        checkbox.className = 'sc-staff-checkbox';
+        checkbox.className = 'sc-resource-checkbox';
 
         // Check whether every primary resource is selected
-        const staffResources = this._staffResources();
-        const filters = this.state.staffFilters.map(String);
-        checkbox.checked = staffResources.length > 0 && staffResources.every((t) => filters.includes(String(t.id)));
-        checkbox.indeterminate = filters.length > 0 && filters.length < staffResources.length;
+        const primaryResources = this._primaryResources();
+        const filters = this.state.resourceFilters.map(String);
+        checkbox.checked = primaryResources.length > 0 && primaryResources.every((t) => filters.includes(String(t.id)));
+        checkbox.indeterminate = filters.length > 0 && filters.length < primaryResources.length;
 
         const dot = document.createElement('span');
         dot.className = 'sc-color-dot';
@@ -183,28 +183,28 @@ export default class StaffFilter {
     }
 
     /**
-     * Create a staff list item with checkbox, color dot, and name
-     * @param {{ id: string, title: string, color: string }} staff
+     * Create a resource list item with checkbox, color dot, and name
+     * @param {{ id: string, title: string, color: string }} resource
      * @returns {HTMLElement}
      */
-    _createStaffItem(staff) {
+    _createResourceItem(resource) {
         const item = document.createElement('div');
-        item.className = 'sc-staff-filter-item sc-staff-filter-item--draggable';
-        item.dataset.staffId = staff.id;
+        item.className = 'sc-resource-filter-item sc-resource-filter-item--draggable';
+        item.dataset.resourceId = resource.id;
         item.draggable = true;
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.value = staff.id;
-        checkbox.className = 'sc-staff-checkbox';
-        checkbox.checked = this.state.staffFilters.map(String).includes(String(staff.id));
+        checkbox.value = resource.id;
+        checkbox.className = 'sc-resource-checkbox';
+        checkbox.checked = this.state.resourceFilters.map(String).includes(String(resource.id));
 
         const dot = document.createElement('span');
         dot.className = 'sc-color-dot';
-        dot.style.backgroundColor = staff.color ?? '#999';
+        dot.style.backgroundColor = resource.color ?? '#999';
 
         const label = document.createElement('span');
-        label.textContent = staff.title;
+        label.textContent = resource.title;
 
         item.appendChild(checkbox);
         item.appendChild(dot);
@@ -228,40 +228,40 @@ export default class StaffFilter {
             if (checkbox.checked) {
                 // Select every primary resource id
                 const allIds = this.state.resources
-                    .filter((r) => r.type === RESOURCE_TYPES.STAFF)
+                    .filter((r) => r.type === RESOURCE_TYPES.PRIMARY)
                     .map((r) => r.id);
-                this.state.setStaffFilters(allIds);
+                this.state.setResourceFilters(allIds);
             } else {
                 // Select none
-                this.state.setStaffFilters([]);
+                this.state.setResourceFilters([]);
             }
             return;
         }
 
-        const checkboxes = this._listEl.querySelectorAll('.sc-staff-checkbox');
+        const checkboxes = this._listEl.querySelectorAll('.sc-resource-checkbox');
         const checkedIds = [];
         for (const cb of checkboxes) {
             if (cb.value !== 'all' && cb.checked) {
                 checkedIds.push(cb.value);
             }
         }
-        this.state.setStaffFilters(checkedIds);
+        this.state.setResourceFilters(checkedIds);
     }
 
     /**
-     * Sync checkbox states with current staff filters
+     * Sync checkbox states with current resource filters
      */
     _syncCheckboxes() {
         if (!this._listEl) {
             return;
         }
-        const filters = this.state.staffFilters;
-        const staffResources = this._staffResources();
-        const checkboxes = this._listEl.querySelectorAll('.sc-staff-checkbox');
+        const filters = this.state.resourceFilters;
+        const primaryResources = this._primaryResources();
+        const checkboxes = this._listEl.querySelectorAll('.sc-resource-checkbox');
         for (const cb of checkboxes) {
             if (cb.value === 'all') {
-                cb.checked = filters.length === staffResources.length && staffResources.length > 0;
-                cb.indeterminate = filters.length > 0 && filters.length < staffResources.length;
+                cb.checked = filters.length === primaryResources.length && primaryResources.length > 0;
+                cb.indeterminate = filters.length > 0 && filters.length < primaryResources.length;
                 continue;
             }
             cb.checked = filters.map(String).includes(String(cb.value));
@@ -276,7 +276,7 @@ export default class StaffFilter {
     _onDragStart(e, item) {
         this._dragSrcEl = item;
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', item.dataset.staffId);
+        e.dataTransfer.setData('text/plain', item.dataset.resourceId);
         item.style.opacity = '0.5';
     }
 
@@ -302,7 +302,7 @@ export default class StaffFilter {
 
         // Reorder in DOM
         const parent = this._dragSrcEl.parentNode;
-        const allItems = [...parent.querySelectorAll('.sc-staff-filter-item--draggable')];
+        const allItems = [...parent.querySelectorAll('.sc-resource-filter-item--draggable')];
         const srcIdx = allItems.indexOf(this._dragSrcEl);
         const tgtIdx = allItems.indexOf(targetItem);
 
@@ -327,17 +327,17 @@ export default class StaffFilter {
     }
 
     /**
-     * Emit reordered staff filters (preserving checked state)
+     * Emit reordered resource filters (preserving checked state)
      */
     _emitReorderedFilters() {
-        const checkboxes = this._listEl.querySelectorAll('.sc-staff-checkbox');
+        const checkboxes = this._listEl.querySelectorAll('.sc-resource-checkbox');
         const checkedIds = [];
         for (const cb of checkboxes) {
             if (cb.value !== 'all' && cb.checked) {
                 checkedIds.push(cb.value);
             }
         }
-        this.state.setStaffFilters(checkedIds);
+        this.state.setResourceFilters(checkedIds);
     }
 
     /**

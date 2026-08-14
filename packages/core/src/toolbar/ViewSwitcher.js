@@ -64,7 +64,7 @@ export default class ViewSwitcher {
                 const view = item.dataset.view;
                 if (view) {
                     this.state.setCurrentView(view);
-                    // Month and List views have no resource columns — auto-switch to Reservation mode
+                    // Month and List views have no resource columns — auto-switch to flat mode
                     if ((view === 'dayGridMonth' || view === 'list') && !isFlatMode(this.state.currentResourceMode)) {
                         this.state.setCurrentResourceMode('flatView');
                     }

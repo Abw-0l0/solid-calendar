@@ -2,7 +2,7 @@
  * ResourceTimeGridView — Resource-based time grid (day/3-day/week)
  *
  * Used for resourceTimeGridDay, resourceTimeGridThreeDay, resourceTimeGridWeek.
- * Creates a grid with resource columns (one per staff/equipment).
+ * Creates a grid with one column per resource (primary or secondary).
  * For multi-day views, creates date groups each containing resource columns.
  *
  * Composes: CalendarGrid + TimeSlotGenerator + ResourceColumnBuilder

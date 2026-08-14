@@ -14,7 +14,7 @@ export default class CalendarState {
         this._currentResourceMode = DEFAULTS.resourceMode;
         this._resources = [];
         this._events = [];
-        this._staffFilters = [];
+        this._resourceFilters = [];
         this._privacyMode = DEFAULTS.privacyMode;
         this._isLoading = false;
         this._businessHours = {};
@@ -31,7 +31,8 @@ export default class CalendarState {
     get currentResourceMode() { return this._currentResourceMode; }
     get resources() { return this._resources; }
     get events() { return this._events; }
-    get staffFilters() { return this._staffFilters; }
+    /** Ids of the primary resources currently shown. Secondary resources are not filterable. */
+    get resourceFilters() { return this._resourceFilters; }
     get privacyMode() { return this._privacyMode; }
     get isLoading() { return this._isLoading; }
     get businessHours() { return this._businessHours; }
@@ -95,9 +96,10 @@ export default class CalendarState {
         this._bus.emit('events:loaded', { events });
     }
 
-    setStaffFilters(staffIds) {
-        this._staffFilters = [...staffIds];
-        this._bus.emit('filter:changed', { staffIds: this._staffFilters });
+    /** @param {string[]} resourceIds ids of the primary resources to show */
+    setResourceFilters(resourceIds) {
+        this._resourceFilters = [...resourceIds];
+        this._bus.emit('filter:changed', { resourceIds: this._resourceFilters });
     }
 
     setPrivacyMode(enabled) {
@@ -126,11 +128,11 @@ export default class CalendarState {
     applyPreferences(prefs) {
         if (prefs.viewType && VIEW_TYPES[prefs.viewType]) this._currentView = prefs.viewType;
         if (prefs.date) this._currentDate = prefs.date;
-        if (prefs.staffFilters && Array.isArray(prefs.staffFilters)) this._staffFilters = [...prefs.staffFilters];
+        if (prefs.resourceFilters && Array.isArray(prefs.resourceFilters)) this._resourceFilters = [...prefs.resourceFilters];
         // Validated rather than assigned: an unknown mode would leave state in a
         // shape no module recognises.
-        if (prefs.resourceView && RESOURCE_MODES[prefs.resourceView]) {
-            this._currentResourceMode = prefs.resourceView;
+        if (prefs.resourceMode && RESOURCE_MODES[prefs.resourceMode]) {
+            this._currentResourceMode = prefs.resourceMode;
         }
         this._cachedDateRange = null;
         this._reconcileViewAndResource();
@@ -160,8 +162,8 @@ export default class CalendarState {
         return {
             viewType: this._currentView,
             date: this._currentDate,
-            staffFilters: [...this._staffFilters],
-            resourceView: this._currentResourceMode
+            resourceFilters: [...this._resourceFilters],
+            resourceMode: this._currentResourceMode
         };
     }
 }

@@ -111,7 +111,8 @@ describe('field map', () => {
     describe('defaults', () => {
         it('should_carry_no_domain_vocabulary', () => {
             const flat = JSON.stringify(DEFAULT_FIELD_MAP);
-            for (const name of ['therapist', 'patient', 'menu', 'equipment', 'booking_color', 'set_menu_id']) {
+            for (const name of ['therapist', 'patient', 'menu', 'equipment', 'booking_color', 'set_menu_id',
+                                'staffSchedules', 'staffOverrides', 'rooms', 'staff']) {
                 expect(flat).not.toContain(name);
             }
         });

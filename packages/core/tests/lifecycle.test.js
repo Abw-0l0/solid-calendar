@@ -16,8 +16,8 @@ const dataSource = {
     async fetchResources() {
         return {
             resources: [
-                { id: 't1', name: 'Dr. Sato', color: '#8935FF' },
-                { id: 't2', name: 'Dr. Tanaka', color: '#007CBE' },
+                { id: 't1', name: 'Alex Chen', color: '#8935FF' },
+                { id: 't2', name: 'Blake Osei', color: '#007CBE' },
             ],
             secondaryResources: [{ id: 'e1', name: 'Room A' }],
         };
@@ -29,7 +29,7 @@ const dataSource = {
             start_time: '09:00',
             end_time: '09:30',
             assignee: { id: 't1' },
-            client: { name: 'A. Yamada' },
+            client: { name: 'J. Ferreira' },
             status: 'Active',
         }];
     },
@@ -151,7 +151,7 @@ describe('CalendarApp lifecycle', () => {
     });
 
     it('should_leave_no_document_listeners_behind_after_destroy', async () => {
-        // StaffFilter, ViewSwitcher, ResourceViewSwitcher and DatePicker each add a
+        // ResourceFilter, ViewSwitcher, ResourceViewSwitcher and DatePicker each add a
         // document-level click listener; leaking one per instance would be invisible.
         const added = new Set();
         const realAdd = document.addEventListener.bind(document);
@@ -177,11 +177,11 @@ describe('CalendarApp lifecycle', () => {
     it('should_ignore_an_unrecognised_stored_resource_mode', async () => {
         app = new CalendarApp({
             el: '#calendar',
-            contextId: 'clinic-1',
+            contextId: 'workspace-1',
             dataSource,
             preferences: {
                 async fetch() {
-                    return { success: true, preferences: { resourceView: 'reservationData' } };
+                    return { success: true, preferences: { resourceMode: 'reservationData' } };
                 },
                 async save() {},
             },
@@ -190,7 +190,7 @@ describe('CalendarApp lifecycle', () => {
 
         // Not a RESOURCE_MODES key. It used to be assigned unvalidated, leaving state
         // in a mode nothing recognises; now it is rejected and the default stands.
-        expect(app.state.currentResourceMode).toBe('staffView');
+        expect(app.state.currentResourceMode).toBe('primaryView');
         expect(el.querySelectorAll('.sc-view')).toHaveLength(1);
     });
 });

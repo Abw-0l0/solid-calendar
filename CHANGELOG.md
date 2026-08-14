@@ -13,9 +13,9 @@ name and strips `-`, `_` and `.` before comparing, so `solidcalendar` and the ex
 Nothing was ever published under the old name, so no installed package, lockfile or import
 anywhere refers to it.
 
-**If you themed or styled the calendar, nothing changes.** The `sc-` class prefix and all
-42 `--sc-*` custom properties are untouched — `SteadyCalendar` keeps the same initials,
-which is why this name was chosen over the alternatives.
+The `sc-` class prefix and all 42 `--sc-*` custom properties survive the rename untouched —
+`SteadyCalendar` keeps the same initials, which is why this name was chosen over the
+alternatives. Four class names do change, but for the unrelated reason below.
 
 ### Changed
 
@@ -28,8 +28,82 @@ which is why this name was chosen over the alternatives.
 - Console messages are tagged `[SteadyCalendar:*]`.
 - The GitHub repository is `Abw-0l0/steady-calendar`.
 
-Unchanged: every class name, every theming custom property, the `sc:slot:select` DOM event,
-the public API, and the `calendar.*` artifact filenames.
+This release also finishes making the library domain-neutral. 0.2.0 generalised the default
+field names and quarantined the clinical vocabulary into one opt-in preset, but it never
+touched the library's own internal vocabulary: the two resource tiers were still called
+`staff` and `resource` in the state, the toolbar, the CSS and the type declarations, while
+`FieldMap` already called the same two tiers `resources` and `secondaryResources`.
+
+That was a contradiction, not just a wording preference. `staff` excludes machines, yet the
+calendar renders one column per person, room **or** machine. And `resource` meant both the
+umbrella concept and the secondary tier at once — `RESOURCE_TYPES.RESOURCE` was the secondary
+tier while `CalendarState.resources` was both. The tiers are now `primary` and `secondary`
+throughout, and `resource` is only ever the umbrella word.
+
+Nothing is published to npm, so these breaking renames cost no existing user anything.
+
+- **BREAKING — the resource tiers are `primary` and `secondary`.**
+  `RESOURCE_TYPES` is `{ PRIMARY: 'primary', SECONDARY: 'secondary' }`, and
+  `CalendarResource.type` holds those values. The resource modes are `primaryView` and
+  `secondaryView` (was `staffView` and `resourceView`); `integratedView` and `flatView`
+  are unchanged. Mode names are simultaneously preference values, `data-mode` attributes
+  and translation keys, so all three move together.
+- **BREAKING — the filter API is named for resources, not people.**
+  `CalendarState.staffFilters` → `resourceFilters`, `setStaffFilters(staffIds)` →
+  `setResourceFilters(resourceIds)`, and `filter:changed` now carries `{ resourceIds }`.
+  It filters the primary tier; secondary-resource events remain exempt.
+- **BREAKING — persisted preference keys.** `staffFilters` → `resourceFilters` and
+  `resourceView` → `resourceMode`. The second is also a correctness fix: the key held a
+  *mode* name, and `resourceView` was simultaneously one of its own possible values. As in
+  0.2.0, an unrecognised stored value is rejected rather than migrated — a dropped filter
+  preference falls back to "all resources visible", so the failure is harmless.
+- **BREAKING — secondary resources take a `secondary-` id prefix**, replacing `resource-`.
+- **BREAKING — the resource-filter CSS classes.** `.sc-staff-filter`,
+  `.sc-staff-filter-item` (and `--draggable`) and `.sc-staff-checkbox` became
+  `.sc-resource-filter`, `.sc-resource-filter-item` and `.sc-resource-checkbox`. The DOM
+  attribute `data-staff-id` became `data-resource-id`. This is the one change that affects
+  you if you themed the calendar; every other class name and all 42 custom properties are
+  untouched.
+- **BREAKING — translation keys.** `staffDisplay` → `resourceDisplay`, `staff` →
+  `resources`, `staffView` → `primaryView`, `resourceView` → `secondaryView`, and
+  `Reservations` → `schedule` (it was also the only PascalCase key). Keys are as public as
+  values, since a host overrides translations *by* key.
+- **BREAKING — `DEFAULT_FIELD_MAP` no longer reads `staffSchedules`, `staffOverrides` or
+  `rooms`.** They moved into `HEALTHCARE_FIELD_MAP`, which still migrates such a payload in
+  one line. Keeping the preset is what lets every default stay generic.
+- Japanese defaults that named one industry are gone: `listResource` read "スタッフ" and
+  `listService` read "メニュー" long after both keys had gone generic.
+- `StaffFilter` is `ResourceFilter` (`src/toolbar/ResourceFilter.js`), and the internal
+  vocabulary follows throughout — `_mapAppointment` → `_mapEvent`, `applyStaffFilter` →
+  `applyResourceFilter`, and the `staff`/`equipment` naming inside `BusinessHoursOverlay`.
+- `RESOURCE_MODES`, `CalendarPreferences.resourceMode` and `CalendarResource.type` are typed
+  as unions rather than `string`, so an invalid mode is a compile error rather than a value
+  the library rejects at runtime.
+
+### Fixed
+
+- **Grouped events lost their styling in 0.2.0 and nobody noticed.** That release renamed the
+  emitted class to `sc-event--group`, but the stylesheet still declared `.sc-event--set-menu`
+  — so for two releases a grouped event matched no rule and rendered with no background or
+  border treatment. The selector now matches what the mapper writes. The separate group
+  indicator triangle was unaffected, which is likely why this went unseen.
+- `ResourceViewSwitcher` emitted `resources-dropdown-item`, an unprefixed class matched by no
+  rule and no query — a leftover the 0.3.0 `sc-` sweep missed. Removed.
+- `CalendarApp` pointed at `docs/DATA-SHAPES.md`, which has never existed. The holiday-hours
+  passthrough is now explained where it happens.
+- Stale comments describing modes the code no longer has (`Machine`, `Reservation`) and a
+  `ListView` header still listing "Patient/Title, Staff, Menu" as its columns.
+
+### Added
+
+- **A guard that keeps the library domain-neutral.** `tests/graph.test.js` now asserts that
+  no file under `src/` uses one industry's vocabulary, with `src/core/FieldMap.js` as the
+  single documented exemption — that is where domain names are *supposed* to live, because
+  `HEALTHCARE_FIELD_MAP` is what lets the defaults stay generic. `tests/i18n.test.js` now
+  scans translation **keys** and the Japanese values too, not just the English values;
+  scanning values alone is exactly why `staffDisplay` and `staff` survived 0.2.0.
+
+Unchanged: the `sc:slot:select` DOM event and the `calendar.*` artifact filenames.
 
 ## [0.3.0] — 2026-08-14
 

@@ -2,7 +2,7 @@
  * ListView — Tabular event list view
  *
  * Renders events as table rows grouped by date with day headers.
- * Columns: Time, Patient/Title, Staff, Menu, Status.
+ * Columns: Time, Client, Resource, Service, Status.
  * Sorted by date then start time. Shows empty state when no events.
  */
 import { createTranslator } from '../core/Translations.js';

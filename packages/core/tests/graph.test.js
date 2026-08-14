@@ -94,7 +94,7 @@ describe('module graph', () => {
 describe('raw-shape containment', () => {
     // Raw incoming field names belong in exactly two places: EventMapper and
     // CalendarApp._buildResources. When that leaked, three renderers ended up reading
-    // fields the mapper never wrote — the staff filter silently stopped filtering, and
+    // fields the mapper never wrote — the resource filter silently stopped filtering, and
     // two ListView columns were permanently blank. Nothing failed, because nothing threw.
     const RENDER_DIRS = ['src/views', 'src/rendering', 'src/grid', 'src/toolbar'];
     const RENDER_FILES = ['src/events/EventRenderer.js', 'src/events/EventContentBuilder.js'];
@@ -125,6 +125,38 @@ describe('raw-shape containment', () => {
         // sourceData is the escape hatch for host callbacks, not for rendering. Reading it
         // from a renderer is how raw-shape knowledge creeps back in.
         const offenders = renderSources().filter((file) => readFileSync(file, 'utf8').includes('sourceData'));
+        expect(offenders).toEqual([]);
+    });
+});
+
+describe('domain-vocabulary containment', () => {
+    // The library is domain-agnostic by design, and staying that way is not something a
+    // one-off rename achieves — 0.2.0 generalised the default field names and `staff`
+    // still survived in the state, the toolbar, the CSS and the type declarations until
+    // 0.4.0. So the rule is asserted rather than remembered.
+    //
+    // One file is exempt, and deliberately: FieldMap.js is where domain names are
+    // *supposed* to live, because HEALTHCARE_FIELD_MAP is the opt-in preset that lets
+    // every default stay generic.
+    const EXEMPT = new Set(['src/core/FieldMap.js']);
+
+    const DOMAIN_WORDS = [
+        // one industry's vocabulary — never the library's own
+        'therapist', 'patient', 'clinic', 'equipment', 'menu', 'staff',
+        // raw field names from the payload this library was extracted from
+        'set_menu', 'booking_color', 'full_name', 'is_system_staff',
+        'facilityUuid', 'staticCalendarData',
+    ];
+
+    it('should_not_use_domain_vocabulary_anywhere_outside_the_field_map', () => {
+        const offenders = [];
+        for (const file of collectSources('src').map(posix)) {
+            if (EXEMPT.has(file)) continue;
+            const source = readFileSync(file, 'utf8').toLowerCase();
+            for (const word of DOMAIN_WORDS) {
+                if (source.includes(word.toLowerCase())) offenders.push(`${file}: ${word}`);
+            }
+        }
         expect(offenders).toEqual([]);
     });
 });

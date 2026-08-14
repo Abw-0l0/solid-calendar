@@ -46,13 +46,13 @@ const write = (msg) => {
     log.textContent = lines.join('\n');
 };
 
-const STAFF = [
+const INSTRUCTORS = [
     { id: 't1', name: 'Alex Chen', color: '#8935FF' },
     { id: 't2', name: 'Blake Osei', color: '#007CBE' },
     { id: 't3', name: 'Corin Vale', color: '#38A169' },
 ];
 
-/** A few appointments spread across today, so overlap layout is visible. */
+/** A few bookings spread across today, so overlap layout is visible. */
 function seedEvents(startDate) {
     const slots = [
         ['t1', '09:00', '09:30', 'J. Ferreira', 'Follow-up'],
@@ -62,18 +62,18 @@ function seedEvents(startDate) {
         ['t2', '11:00', '11:40', 'T. Marchetti', 'Review'],
         ['t3', '13:00', '14:00', 'N. Duarte', 'Consultation'],
     ];
-    const events = slots.map(([staff, start, end, patient, menu], i) => ({
+    const events = slots.map(([instructor, start, end, clientName, serviceName], i) => ({
         id: `r${i + 1}`,
         date: startDate,
         start_time: start,
         end_time: end,
-        assignee: { id: staff, color: STAFF.find((s) => s.id === staff).color },
-        client: { name: patient },
-        service: { name: menu },
+        assignee: { id: instructor, color: INSTRUCTORS.find((s) => s.id === instructor).color },
+        client: { name: clientName },
+        service: { name: serviceName },
         status: 'Active',
     }));
 
-    // An event carrying a title is a time block by default, not an appointment.
+    // An event carrying a title is a time block by default, not a booking.
     events.push({
         id: 'block-1',
         date: startDate,
@@ -92,13 +92,13 @@ const calendar = new CalendarApp({
     locale: 'en-US',
 
     translations: {
-        Reservations: 'Studio schedule',
+        schedule: 'Studio schedule',
         today: 'Today',
-        staffDisplay: 'Instructors',
-        staff: 'Instructors',
+        resourceDisplay: 'Instructors',
+        resources: 'Instructors',
         // Resource-mode labels are keyed by mode name.
-        staffView: 'By instructor',
-        resourceView: 'By room',
+        primaryView: 'By instructor',
+        secondaryView: 'By room',
         integratedView: 'Everything',
         flatView: 'By date',
         selectAll: 'Select all',
@@ -109,7 +109,7 @@ const calendar = new CalendarApp({
     dataSource: {
         async fetchResources() {
             return {
-                resources: STAFF,
+                resources: INSTRUCTORS,
                 secondaryResources: [{ id: 'room-a', name: 'Room A', color: '#D69E2E' }],
                 businessHours: [
                     { day_of_week: 'Monday', start_time: '09:00', end_time: '18:00' },

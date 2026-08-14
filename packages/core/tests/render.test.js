@@ -17,8 +17,8 @@ function dataSource({ events } = {}) {
         async fetchResources() {
             return {
                 resources: [
-                    { id: 't1', name: 'Dr. Sato', color: '#8935FF' },
-                    { id: 't2', name: 'Dr. Tanaka', color: '#007CBE' },
+                    { id: 't1', name: 'Alex Chen', color: '#8935FF' },
+                    { id: 't2', name: 'Blake Osei', color: '#007CBE' },
                 ],
                 secondaryResources: [{ id: 'e1', name: 'Room A', color: '#38A169' }],
             };
@@ -31,7 +31,7 @@ function dataSource({ events } = {}) {
                     start_time: '09:00',
                     end_time: '09:30',
                     assignee: { id: 't1', color: '#8935FF' },
-                    client: { name: 'A. Yamada' },
+                    client: { name: 'J. Ferreira' },
                     status: 'Active',
                 },
             ];
@@ -77,7 +77,7 @@ describe('CalendarApp rendering', () => {
         expect(el.querySelector('.sc-time-axis')).toBeTruthy();
     });
 
-    it('should_build_one_column_per_staff_resource_in_staff_view', async () => {
+    it('should_build_one_column_per_primary_resource_in_primary_view', async () => {
         app = new CalendarApp({ el: '#calendar', dataSource: dataSource() });
         await app.init();
 
@@ -101,7 +101,7 @@ describe('CalendarApp rendering', () => {
         const event = el.querySelector('.sc-event[data-event-id="r1"]');
         expect(event).toBeTruthy();
         // Catches the removed "first available column" fallback, which put events
-        // under whichever staff member happened to be listed first.
+        // under whichever primary resource happened to be listed first.
         expect(event.closest('.sc-column').dataset.resourceId).toBe('t1');
         expect(event.style.top).toBe(`${topFor('09:00')}px`);
         expect(event.style.height).toBe(`${heightFor('09:00', '09:30')}px`);

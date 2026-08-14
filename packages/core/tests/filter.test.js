@@ -65,7 +65,7 @@ describe('resource filtering', () => {
         expect(displayOf(el, 'a')).toBe('');
         expect(displayOf(el, 'b')).toBe('');
 
-        app.state.setStaffFilters(['t1']);
+        app.state.setResourceFilters(['t1']);
 
         expect(displayOf(el, 'a')).toBe('');
         expect(displayOf(el, 'b')).toBe('none');
@@ -75,10 +75,10 @@ describe('resource filtering', () => {
         app = makeApp();
         await app.init();
 
-        app.state.setStaffFilters(['t1']);
+        app.state.setResourceFilters(['t1']);
         expect(displayOf(el, 'b')).toBe('none');
 
-        app.state.setStaffFilters(['t1', 't2']);
+        app.state.setResourceFilters(['t1', 't2']);
         expect(displayOf(el, 'b')).toBe('');
     });
 
@@ -86,7 +86,7 @@ describe('resource filtering', () => {
         app = makeApp();
         await app.init();
 
-        app.state.setStaffFilters([]);
+        app.state.setResourceFilters([]);
 
         expect(displayOf(el, 'a')).toBe('none');
         expect(displayOf(el, 'b')).toBe('none');
@@ -109,7 +109,7 @@ describe('resource filtering', () => {
         app.state.setCurrentView('timeGridDay');
         await new Promise((r) => setTimeout(r, 0));
 
-        app.state.setStaffFilters([]);
+        app.state.setResourceFilters([]);
         const block = el.querySelector('.sc-event[data-event-id="block"]');
         if (block) expect(block.style.display).toBe('');
     });
@@ -123,7 +123,7 @@ describe('resource filtering', () => {
         ];
         await app.init();
 
-        app.state.setStaffFilters(['t1']);
+        app.state.setResourceFilters(['t1']);
         expect(displayOf(el, 'b')).toBe('');
     });
 
@@ -151,7 +151,7 @@ describe('resource filtering', () => {
         expect(app.state.events).toHaveLength(2);
         expect(el.querySelectorAll('.sc-event')).toHaveLength(2);
 
-        app.state.setStaffFilters(['u1']);
+        app.state.setResourceFilters(['u1']);
         expect(displayOf(el, 'b')).toBe('none');
     });
 

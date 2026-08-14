@@ -180,7 +180,7 @@ Function form wins; the URL form is a fallback.
 | `fetchEvents({ start, end })` | Raw events for the range. Cached 5 minutes per range. |
 | `resourcesUrl` / `eventsUrl` | Used when the functions are absent. Events are fetched as `${eventsUrl}?start_date=…&end_date=…`. |
 
-Secondary resources get a `resource-` id prefix so a room id cannot collide with a person's.
+Secondary resources get a `secondary-` id prefix so their ids cannot collide with primary ones.
 
 ### Views and modes
 
@@ -192,7 +192,7 @@ Secondary resources get a `resource-` id prefix so a room id cannot collide with
 | `dayGridMonth` | month | no |
 | `list` | 7 days | no |
 
-Resource modes: `staffView`, `resourceView`, `integratedView` (both), `flatView` (date columns). Grid geometry: 10-minute slots at 12 px, labelled every 30 minutes, across a full 24-hour day.
+Resource modes: `primaryView`, `secondaryView`, `integratedView` (both), `flatView` (date columns). Grid geometry: 10-minute slots at 12 px, labelled every 30 minutes, across a full 24-hour day.
 
 ## API
 
@@ -201,7 +201,7 @@ Resource modes: `staffView`, `resourceView`, `integratedView` (both), `flatView`
 | `CalendarApp` | `init()` | Resolves the container, loads data, mounts the UI. Async. |
 | | `destroy()` | Tears everything down; leaves the container empty. |
 | `.state` | `setCurrentDate` / `setCurrentView` / `setCurrentResourceMode` | Trigger refetch and re-render. |
-| | `setStaffFilters(ids)` / `setPrivacyMode(bool)` | |
+| | `setResourceFilters(ids)` / `setPrivacyMode(bool)` | |
 | | `currentDate`, `events`, `resources`, `dateRange`, … | Read-only getters. |
 | `.bus` | `on(event, handler)` | Returns an unsubscribe function. |
 | `.dataBridge` | `refresh(refreshStatic?)` | Clears the cache and reloads. |
@@ -216,7 +216,7 @@ calendar.bus.on('events:loaded', ({ events }) => { /* … */ });
 |---|---|
 | `events:loaded` / `resources:loaded` | `{ events }` / `{ resources }` |
 | `date:changed` / `view:changed` / `resource:changed` | `{ date }` / `{ view, resourceMode }` / `{ mode }` |
-| `filter:changed` / `privacy:changed` / `loading:changed` | `{ staffIds }` / `{ enabled }` / `{ isLoading }` |
+| `filter:changed` / `privacy:changed` / `loading:changed` | `{ resourceIds }` / `{ enabled }` / `{ isLoading }` |
 | `event:click` | `{ event, element }` |
 | `event:drop` | `{ event, newDate, newTime, newResourceId, oldResourceId, revert }` |
 | `event:resize` | `{ event, newEndTime, revert }` |

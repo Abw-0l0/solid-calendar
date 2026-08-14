@@ -94,9 +94,9 @@ export default class CalendarGrid {
             this._dateColumnBuilder.init(this._columnsContainer);
         }
 
-        // Apply current staff filter to newly built columns
+        // Apply current resource filter to newly built columns
         if (this.state.isResourceView && !isFlatMode(this.state.currentResourceMode)) {
-            this._resourceColumnBuilder.applyStaffFilter(this.state.staffFilters);
+            this._resourceColumnBuilder.applyResourceFilter(this.state.resourceFilters);
         }
     }
 
@@ -123,19 +123,19 @@ export default class CalendarGrid {
             this.bus.on('resource:changed', () => this._rebuild()),
             // Columns come from state.resources, which is populated asynchronously.
             this.bus.on('resources:loaded', () => this._rebuild()),
-            this.bus.on('filter:changed', ({ staffIds }) => this._applyStaffFilter(staffIds))
+            this.bus.on('filter:changed', ({ resourceIds }) => this._applyResourceFilter(resourceIds))
         );
 
         this._gridEl?.addEventListener('scroll', this._handleScroll, { passive: true });
     }
 
     /**
-     * Apply staff filter to resource columns — hide/show columns
-     * @param {string[]} staffIds
+     * Apply the resource filter to resource columns — hide/show columns
+     * @param {string[]} resourceIds
      */
-    _applyStaffFilter(staffIds) {
+    _applyResourceFilter(resourceIds) {
         if (this.state.isResourceView && !isFlatMode(this.state.currentResourceMode)) {
-            this._resourceColumnBuilder.applyStaffFilter(staffIds);
+            this._resourceColumnBuilder.applyResourceFilter(resourceIds);
         }
     }
 

@@ -12,7 +12,7 @@ describe('CalendarState', () => {
     it('should_have_default_values', () => {
         const { state } = createState();
         expect(state.currentView).toBe('resourceTimeGridDay');
-        expect(state.currentResourceMode).toBe('staffView');
+        expect(state.currentResourceMode).toBe('primaryView');
         expect(state.privacyMode).toBe(false);
         expect(state.isLoading).toBe(false);
         expect(state.resources).toEqual([]);
@@ -44,7 +44,7 @@ describe('CalendarState', () => {
         state.setCurrentView('resourceTimeGridWeek');
         expect(handler).toHaveBeenCalledWith({
             view: 'resourceTimeGridWeek',
-            resourceMode: 'staffView'
+            resourceMode: 'primaryView'
         });
     });
 
@@ -96,12 +96,12 @@ describe('CalendarState', () => {
         state.applyPreferences({
             viewType: 'resourceTimeGridWeek',
             date: '2026-06-01',
-            staffFilters: ['a', 'b'],
-            resourceView: 'integratedView'
+            resourceFilters: ['a', 'b'],
+            resourceMode: 'integratedView'
         });
         expect(state.currentView).toBe('resourceTimeGridWeek');
         expect(state.currentDate).toBe('2026-06-01');
-        expect(state.staffFilters).toEqual(['a', 'b']);
+        expect(state.resourceFilters).toEqual(['a', 'b']);
         expect(state.currentResourceMode).toBe('integratedView');
     });
 
@@ -109,7 +109,7 @@ describe('CalendarState', () => {
         const { state } = createState();
         state.applyPreferences({
             viewType: 'resourceTimeGridDay',
-            resourceView: 'flatView'
+            resourceMode: 'flatView'
         });
         // flatView needs non-resource view
         expect(state.currentView).toBe('timeGridDay');
@@ -119,13 +119,13 @@ describe('CalendarState', () => {
         const { state } = createState();
         state.setCurrentDate('2026-05-01');
         state.setCurrentView('resourceTimeGridWeek');
-        state.setStaffFilters(['x']);
+        state.setResourceFilters(['x']);
         const prefs = state.toPreferences();
         expect(prefs).toEqual({
             viewType: 'resourceTimeGridWeek',
             date: '2026-05-01',
-            staffFilters: ['x'],
-            resourceView: 'staffView'
+            resourceFilters: ['x'],
+            resourceMode: 'primaryView'
         });
     });
 
