@@ -7,7 +7,7 @@
  * this, several strings were selected by testing `locale === 'ja-JP'` inside a renderer,
  * which meant Japanese was hardcoded into modules and no third language was reachable.
  *
- *     import { JA_TRANSLATIONS } from 'solidcalendar';
+ *     import { JA_TRANSLATIONS } from 'steadycalendar';
  *     new CalendarApp({ locale: 'ja-JP', translations: JA_TRANSLATIONS })
  *
  * Every key falls back to its English default, so supplying none, or a partial map, is

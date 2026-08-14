@@ -5,7 +5,7 @@
 Please **do not open a public issue** for a security vulnerability.
 
 Report it through GitHub's private advisory form:
-<https://github.com/Abw-0l0/solid-calendar/security/advisories/new>
+<https://github.com/Abw-0l0/steady-calendar/security/advisories/new>
 
 You should get an acknowledgement within a week. If a fix is warranted, it will ship in
 a patch release with credit to you unless you prefer otherwise.
@@ -30,7 +30,7 @@ In scope:
 Out of scope:
 
 - Vulnerabilities in a host application's own API, auth, or CSP.
-- `@holiday-jp/holiday_jp`, the one runtime dependency of `solidcalendar-pro` —
+- `@holiday-jp/holiday_jp`, the one runtime dependency of `steadycalendar-pro` —
   report those upstream.
 - Denial of service from deliberately pathological input volumes (rendering ten thousand
   overlapping events will be slow; that is not a security boundary).

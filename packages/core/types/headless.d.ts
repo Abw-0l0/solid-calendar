@@ -1,5 +1,5 @@
 /**
- * solidcalendar/headless — TypeScript declarations
+ * steadycalendar/headless — TypeScript declarations
  *
  * State, data and utilities, with no rendering layer.
  *

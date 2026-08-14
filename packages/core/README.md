@@ -1,4 +1,4 @@
-# solidcalendar
+# steadycalendar
 
 A resource-scheduling calendar for booking and appointment apps. Vanilla JavaScript, zero runtime dependencies, 26.7 kB gzipped.
 
@@ -11,12 +11,12 @@ Built for, and proven in, a commercial booking product at scale — then general
 - Time blocks distinct from bookings, resource filtering, privacy mode, persisted view preferences
 - Any field names, any language, any timezone
 
-Full documentation: **[github.com/Abw-0l0/solid-calendar](https://github.com/Abw-0l0/solid-calendar#readme)**
+Full documentation: **[github.com/Abw-0l0/steady-calendar](https://github.com/Abw-0l0/steady-calendar#readme)**
 
 ## Install
 
 ```bash
-npm install solidcalendar
+npm install steadycalendar
 ```
 
 There is nothing else to install. Node 18+ to build from source.
@@ -24,8 +24,8 @@ There is nothing else to install. Node 18+ to build from source.
 ## Quickstart
 
 ```js
-import { CalendarApp } from 'solidcalendar';
-import 'solidcalendar/styles';
+import { CalendarApp } from 'steadycalendar';
+import 'steadycalendar/styles';
 
 const calendar = new CalendarApp({
   el: '#calendar',
@@ -86,7 +86,7 @@ A value may be a name, an ordered list of candidates, or a function; names may b
 `locale` formats dates and numbers; `translations` supplies strings. They are independent, so any language works without the library knowing it exists.
 
 ```js
-import { JA_TRANSLATIONS } from 'solidcalendar';
+import { JA_TRANSLATIONS } from 'steadycalendar';
 
 new CalendarApp({ locale: 'ja-JP', translations: JA_TRANSLATIONS, /* … */ });
 ```
@@ -95,15 +95,15 @@ new CalendarApp({ locale: 'ja-JP', translations: JA_TRANSLATIONS, /* … */ });
 
 | Import | What you get |
 |---|---|
-| `solidcalendar` | The calendar. 26.7 kB gzip. |
-| `solidcalendar/headless` | State, data and date utilities, no DOM. 7.2 kB gzip. |
-| `solidcalendar/styles` | The stylesheet. |
+| `steadycalendar` | The calendar. 26.7 kB gzip. |
+| `steadycalendar/headless` | State, data and date utilities, no DOM. 7.2 kB gzip. |
+| `steadycalendar/styles` | The stylesheet. |
 
-A `<script>` build is published too — `dist/calendar.global.min.js` exposes `window.SolidCalendar` and needs no loader.
+A `<script>` build is published too — `dist/calendar.global.min.js` exposes `window.SteadyCalendar` and needs no loader.
 
 ## Accessibility
 
-The calendar is currently pointer-driven: events are not keyboard focusable and there is no keyboard equivalent for moving, resizing or creating them. This is a known gap with a published roadmap — see [ACCESSIBILITY.md](https://github.com/Abw-0l0/solid-calendar/blob/main/ACCESSIBILITY.md) before adopting it somewhere keyboard access is required.
+The calendar is currently pointer-driven: events are not keyboard focusable and there is no keyboard equivalent for moving, resizing or creating them. This is a known gap with a published roadmap — see [ACCESSIBILITY.md](https://github.com/Abw-0l0/steady-calendar/blob/main/ACCESSIBILITY.md) before adopting it somewhere keyboard access is required.
 
 ## License
 

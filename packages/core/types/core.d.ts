@@ -1,5 +1,5 @@
 /**
- * solidcalendar — shared declarations
+ * steadycalendar — shared declarations
  *
  * Everything the headless entry point exposes lives here. `index.d.ts` re-exports it and
  * adds the rendering layer; `headless.d.ts` re-exports it alone. The split matters: the
@@ -420,7 +420,7 @@ export namespace temporal {
     /**
      * Sets the zone used to resolve "now". CalendarApp calls this from its constructor
      * with `config.timezone`. Module-level, so one zone applies per page. Pass null to
-     * restore the default (SOLIDCALENDAR_TIMEZONE, else the system zone).
+     * restore the default (STEADYCALENDAR_TIMEZONE, else the system zone).
      */
     function setDefaultTimezone(timeZone?: string | null): string;
     function getDefaultTimezone(): string;

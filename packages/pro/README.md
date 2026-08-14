@@ -1,23 +1,23 @@
-# solidcalendar-pro
+# steadycalendar-pro
 
-Optional plugins for [`solidcalendar`](../core): drag/resize persistence and Japanese public holidays.
+Optional plugins for [`steadycalendar`](../core): drag/resize persistence and Japanese public holidays.
 
 
 ## Install
 
 ```bash
-npm install solidcalendar solidcalendar-pro
+npm install steadycalendar steadycalendar-pro
 ```
 
-`solidcalendar` is a peer dependency. Unlike the core, this package has one runtime dependency: [`@holiday-jp/holiday_jp`](https://github.com/holiday-jp/holiday_jp-js), which supplies the holiday data.
+`steadycalendar` is a peer dependency. Unlike the core, this package has one runtime dependency: [`@holiday-jp/holiday_jp`](https://github.com/holiday-jp/holiday_jp-js), which supplies the holiday data.
 
 ## DragPersistencePlugin
 
 Listens for `event:drop` and `event:resize` and writes the change through your API. On success it emits `data:refresh`; on failure it reverts the element.
 
 ```js
-import { CalendarApp } from 'solidcalendar';
-import { DragPersistencePlugin } from 'solidcalendar-pro';
+import { CalendarApp } from 'steadycalendar';
+import { DragPersistencePlugin } from 'steadycalendar-pro';
 
 const calendar = new CalendarApp({
   el: '#calendar',
@@ -70,7 +70,7 @@ Cancelled events are reverted without calling your handler — read from the nor
 Supplies Japanese public holidays, cached per year. Passing it in `plugins` is enough — `CalendarApp` adopts any registered plugin implementing `getHoliday` as `config.holidayProvider`.
 
 ```js
-import { JapaneseHolidayProvider } from 'solidcalendar-pro';
+import { JapaneseHolidayProvider } from 'steadycalendar-pro';
 
 const calendar = new CalendarApp({
   el: '#calendar',

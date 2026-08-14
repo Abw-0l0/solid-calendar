@@ -1,4 +1,4 @@
-# SolidCalendar
+# SteadyCalendar
 
 A resource-scheduling calendar for booking and appointment apps, in vanilla JavaScript with zero runtime dependencies.
 
@@ -12,7 +12,7 @@ Built for, and proven in, a commercial booking product at scale — then general
 
 Every off-the-shelf scheduling calendar meant taking on a large dependency and then working against its abstractions to get the booking behaviour the product actually needed: multi-resource columns, per-resource closed days, time blocks distinct from bookings, per-site business hours.
 
-The trade was a bigger bundle in exchange for less control over the part of the product that mattered most. SolidCalendar inverts it. The core owns state, date maths and event normalisation; rendering is a layer you can use, replace, or leave out. Zero runtime dependencies is a constraint the architecture is organised around, and CI asserts it — a test fails if anything from `node_modules` reaches the bundle.
+The trade was a bigger bundle in exchange for less control over the part of the product that mattered most. SteadyCalendar inverts it. The core owns state, date maths and event normalisation; rendering is a layer you can use, replace, or leave out. Zero runtime dependencies is a constraint the architecture is organised around, and CI asserts it — a test fails if anything from `node_modules` reaches the bundle.
 
 ## What it does
 
@@ -26,11 +26,11 @@ The trade was a bigger bundle in exchange for less control over the part of the 
 
 ## Install
 
-Not published to npm yet — `npm install solidcalendar` will 404. Build from source:
+Not published to npm yet — `npm install steadycalendar` will 404. Build from source:
 
 ```bash
-git clone https://github.com/Abw-0l0/solid-calendar.git
-cd solid-calendar
+git clone https://github.com/Abw-0l0/steady-calendar.git
+cd steady-calendar
 npm install
 npm run build
 ```
@@ -38,18 +38,18 @@ npm run build
 Then pack the workspace and install the tarball into your project:
 
 ```bash
-npm pack -w packages/core          # -> solidcalendar-0.3.0.tgz
+npm pack -w packages/core          # -> steadycalendar-0.4.0.tgz
 cd ../your-app
-npm install ../solid-calendar/solidcalendar-0.3.0.tgz
+npm install ../steady-calendar/steadycalendar-0.4.0.tgz
 ```
 
 | Entry point | Artifact |
 |---|---|
-| `import { CalendarApp } from 'solidcalendar'` | `dist/calendar.esm.js` |
-| `require('solidcalendar')` | `dist/calendar.cjs` |
-| `<script src="…/calendar.global.min.js">` → `window.SolidCalendar` | self-contained, no loader |
-| `import 'solidcalendar/styles'` | `dist/calendar.css` |
-| `import { CalendarState } from 'solidcalendar/headless'` | state and data only, 8.7 kB gzip |
+| `import { CalendarApp } from 'steadycalendar'` | `dist/calendar.esm.js` |
+| `require('steadycalendar')` | `dist/calendar.cjs` |
+| `<script src="…/calendar.global.min.js">` → `window.SteadyCalendar` | self-contained, no loader |
+| `import 'steadycalendar/styles'` | `dist/calendar.css` |
+| `import { CalendarState } from 'steadycalendar/headless'` | state and data only, 8.7 kB gzip |
 
 Node 18+ to build and test. Nothing to install at runtime.
 
@@ -58,8 +58,8 @@ Node 18+ to build and test. Nothing to install at runtime.
 Verified against this tree — `tests/readme.test.js` executes it.
 
 ```js
-import { CalendarApp } from 'solidcalendar';
-import 'solidcalendar/styles';
+import { CalendarApp } from 'steadycalendar';
+import 'steadycalendar/styles';
 
 const calendar = new CalendarApp({
   el: '#calendar',
@@ -138,7 +138,7 @@ If nothing resolves, the calendar logs which names it looked for and which your 
 `locale` formats dates and numbers. `translations` supplies strings. They are independent, so a language the library has never heard of works fine:
 
 ```js
-import { JA_TRANSLATIONS } from 'solidcalendar';
+import { JA_TRANSLATIONS } from 'steadycalendar';
 
 new CalendarApp({ locale: 'ja-JP', translations: JA_TRANSLATIONS, /* … */ });
 
@@ -255,13 +255,13 @@ calendar.bus.on('event:drop', async ({ event, newDate, newTime, newResourceId, r
 });
 ```
 
-`solidcalendar-pro` packages this as `DragPersistencePlugin`, with `canDrop` / `canResize` guards.
+`steadycalendar-pro` packages this as `DragPersistencePlugin`, with `canDrop` / `canResize` guards.
 
 ### Computing free slots headlessly
 
 ```js
 import { EventBus, CalendarState, DataBridge, temporal, SLOT_INTERVAL }
-  from 'solidcalendar/headless';
+  from 'steadycalendar/headless';
 
 const { convertTimeToMinutes, convertMinutesToTime } = temporal;
 
@@ -337,8 +337,8 @@ jsdom has no layout engine, so it proves structure, not appearance. `examples/in
 
 | Package | Contents |
 |---|---|
-| `packages/core` — `solidcalendar` | The calendar. Zero runtime dependencies. |
-| `packages/pro` — `solidcalendar-pro` | `DragPersistencePlugin` and `JapaneseHolidayProvider`. Depends on `@holiday-jp/holiday_jp`. |
+| `packages/core` — `steadycalendar` | The calendar. Zero runtime dependencies. |
+| `packages/pro` — `steadycalendar-pro` | `DragPersistencePlugin` and `JapaneseHolidayProvider`. Depends on `@holiday-jp/holiday_jp`. |
 
 Both MIT.
 

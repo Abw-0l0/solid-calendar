@@ -1,4 +1,4 @@
-# Contributing to SolidCalendar
+# Contributing to SteadyCalendar
 
 Thanks for looking. Issues, questions and pull requests are all welcome — including
 "this documentation is wrong", which is a real bug.

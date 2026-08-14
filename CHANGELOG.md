@@ -3,6 +3,34 @@
 All notable changes to this project are documented here.
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] — 2026-08-14
+
+Renamed to **SteadyCalendar**. The previous name could not be published: npm rejected it
+with `403 Package name too similar to existing package solid-calendar`. npm lowercases a
+name and strips `-`, `_` and `.` before comparing, so `solidcalendar` and the existing
+`solid-calendar` normalise to the same string. The name was unusable, not merely taken.
+
+Nothing was ever published under the old name, so no installed package, lockfile or import
+anywhere refers to it.
+
+**If you themed or styled the calendar, nothing changes.** The `sc-` class prefix and all
+42 `--sc-*` custom properties are untouched — `SteadyCalendar` keeps the same initials,
+which is why this name was chosen over the alternatives.
+
+### Changed
+
+- **BREAKING — package names.** The packages are `steadycalendar` and `steadycalendar-pro`,
+  both unscoped. Subpaths are `steadycalendar/headless` and `steadycalendar/styles`.
+- **BREAKING — the browser global is `window.SteadyCalendar`** (`SteadyCalendarPro` for the
+  plugins package).
+- **BREAKING** — the environment variable is `STEADYCALENDAR_TIMEZONE`. `config.timezone`
+  is unaffected and still takes precedence.
+- Console messages are tagged `[SteadyCalendar:*]`.
+- The GitHub repository is `Abw-0l0/steady-calendar`.
+
+Unchanged: every class name, every theming custom property, the `sc:slot:select` DOM event,
+the public API, and the `calendar.*` artifact filenames.
+
 ## [0.3.0] — 2026-08-14
 
 Renamed to **SolidCalendar**. The previous name said nothing about calendars or
@@ -151,4 +179,4 @@ Initial version. Never published to npm.
   artifact was an ESM file with a bare import, so it could never load.
 - Root `npm test` failed: `packages/pro` had a test script and no test files.
 
-[0.3.0]: https://github.com/Abw-0l0/solid-calendar/releases/tag/v0.3.0
+[0.4.0]: https://github.com/Abw-0l0/steady-calendar/releases/tag/v0.4.0

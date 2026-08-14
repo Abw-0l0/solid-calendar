@@ -24,10 +24,10 @@ const REQUIRED = ['CalendarApp', 'EventBus', 'CalendarState', 'EventMapper', 'Pl
 try {
     const code = readFileSync(target, 'utf8');
     const context = vm.createContext({ console });
-    vm.runInContext(`${code}\n;globalThis.__api = typeof SolidCalendar !== 'undefined' ? SolidCalendar : undefined;`, context);
+    vm.runInContext(`${code}\n;globalThis.__api = typeof SteadyCalendar !== 'undefined' ? SteadyCalendar : undefined;`, context);
 
     const api = context.__api;
-    if (!api) throw new Error('global "SolidCalendar" was not defined after evaluation');
+    if (!api) throw new Error('global "SteadyCalendar" was not defined after evaluation');
 
     const missing = REQUIRED.filter((k) => !(k in api));
     if (missing.length) throw new Error(`missing exports: ${missing.join(', ')}`);

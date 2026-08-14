@@ -1,6 +1,6 @@
 # Accessibility
 
-**SolidCalendar is pointer-driven today. A keyboard user cannot focus, read, move, resize, or create an event.** If keyboard access is a requirement for you, this library is not ready, and this page exists so you find that out here rather than after integrating it.
+**SteadyCalendar is pointer-driven today. A keyboard user cannot focus, read, move, resize, or create an event.** If keyboard access is a requirement for you, this library is not ready, and this page exists so you find that out here rather than after integrating it.
 
 This is a stated gap, not an oversight, and not a claim of partial conformance. There is no WCAG conformance claim of any level.
 

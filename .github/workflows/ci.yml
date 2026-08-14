@@ -140,16 +140,16 @@ jobs:
         run: |
           mkdir -p /tmp/consumer && cd /tmp/consumer
           npm init -y >/dev/null
-          npm install /tmp/solidcalendar-*.tgz
+          npm install /tmp/steadycalendar-*.tgz
           node --input-type=commonjs -e "
-            const api = require('solidcalendar');
+            const api = require('steadycalendar');
             if (typeof api.CalendarApp !== 'function') throw new Error('CalendarApp missing from require()');
             const state = new api.CalendarState({ emit() {}, on() {} });
             if (!/^\d{4}-\d{2}-\d{2}\$/.test(state.currentDate)) throw new Error('bad currentDate: ' + state.currentDate);
             console.log('require() ok on node ' + process.version + ' — ' + Object.keys(api).length + ' exports');
           "
           node --input-type=module -e "
-            import { temporal, SLOT_INTERVAL } from 'solidcalendar/headless';
+            import { temporal, SLOT_INTERVAL } from 'steadycalendar/headless';
             if (temporal.addMonths('2026-01-31', 1) !== '2026-02-28') throw new Error('month clamping wrong');
             if (SLOT_INTERVAL !== 10) throw new Error('constant missing');
             console.log('headless esm ok on node ' + process.version);

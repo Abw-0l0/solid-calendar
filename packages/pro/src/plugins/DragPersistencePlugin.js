@@ -109,7 +109,7 @@ export default class DragPersistencePlugin {
     }
 
     _handleError(err, event, revert, action) {
-        console.error(`[SolidCalendar:DragPersistence] ${action} failed:`, err);
+        console.error(`[SteadyCalendar:DragPersistence] ${action} failed:`, err);
         if (typeof this.options.onError === 'function') {
             this.options.onError(err, event, revert);
             return;

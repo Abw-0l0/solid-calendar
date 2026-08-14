@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to release, e.g. v0.3.0'
+        description: 'Tag to release, e.g. v0.4.0'
         required: true
       publish:
         description: 'Publish to npm'
@@ -90,13 +90,13 @@ jobs:
       # once trusted publishing is configured.
       #
       # Order matters: pro declares core as a peer dependency.
-      - name: Publish solidcalendar
+      - name: Publish steadycalendar
         if: github.event_name == 'push' || inputs.publish
         run: npm publish --provenance --access public -w packages/core
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish solidcalendar-pro
+      - name: Publish steadycalendar-pro
         if: github.event_name == 'push' || inputs.publish
         run: npm publish --provenance --access public -w packages/pro
         env:
@@ -109,7 +109,7 @@ jobs:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           generate_release_notes: true
           body: |
-            `solidcalendar@${{ needs.verify.outputs.version }}` and
-            `solidcalendar-pro@${{ needs.verify.outputs.version }}` are on npm.
+            `steadycalendar@${{ needs.verify.outputs.version }}` and
+            `steadycalendar-pro@${{ needs.verify.outputs.version }}` are on npm.
 
-            See [CHANGELOG.md](https://github.com/Abw-0l0/solid-calendar/blob/main/CHANGELOG.md).
+            See [CHANGELOG.md](https://github.com/Abw-0l0/steady-calendar/blob/main/CHANGELOG.md).

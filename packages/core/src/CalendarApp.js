@@ -46,7 +46,7 @@ export default class CalendarApp {
         const el = this.config.el ?? '#calendar';
         this._container = typeof el === 'string' ? document.querySelector(el) : el;
         if (!this._container) {
-            console.error(`[SolidCalendar:CalendarApp] Container not found: ${el}`);
+            console.error(`[SteadyCalendar:CalendarApp] Container not found: ${el}`);
             return;
         }
 
@@ -104,7 +104,7 @@ export default class CalendarApp {
         await this.dataBridge.loadEvents();
         this._setupResizeObserver(this._container);
 
-        console.warn('[SolidCalendar:CalendarApp] Initialized');
+        console.warn('[SteadyCalendar:CalendarApp] Initialized');
     }
 
 
@@ -228,7 +228,7 @@ export default class CalendarApp {
             ...candidateNames('dataset', 'secondaryResources', this.config.fieldMap),
         ];
         console.warn(
-            `[SolidCalendar:CalendarApp] No resources resolved. Looked for ${looked.join(', ')}; ` +
+            `[SteadyCalendar:CalendarApp] No resources resolved. Looked for ${looked.join(', ')}; ` +
             `the payload has ${present.join(', ')}. Set config.fieldMap.dataset to map them.`
         );
     }
