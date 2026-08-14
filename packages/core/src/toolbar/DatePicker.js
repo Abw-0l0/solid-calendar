@@ -7,7 +7,6 @@
 import { createTranslator } from '../core/Translations.js';
 import {
     getCurrentDate,
-    addMonths,
     getWeekdayNames,
     getMonthRange,
     parseLocalDate,
@@ -105,7 +104,7 @@ export default class DatePicker {
         prevBtn.setAttribute('aria-label', this._t('previousMonthText'));
         prevBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            this._onPrevMonth();
+            this._shiftMonth(-1);
         });
 
         this._headerLabel = document.createElement('span');
@@ -118,7 +117,7 @@ export default class DatePicker {
         nextBtn.setAttribute('aria-label', this._t('nextMonthText'));
         nextBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            this._onNextMonth();
+            this._shiftMonth(1);
         });
 
         header.appendChild(prevBtn);
@@ -316,19 +315,21 @@ export default class DatePicker {
         this._close();
     }
 
-    _onPrevMonth() {
+    /**
+     * Step the displayed month without touching the selected date.
+     *
+     * Uses parseLocalDate().add() rather than addMonths(), which returns a 'YYYY-MM-DD'
+     * string: reading .year and .month off that string gave undefined, and undefined
+     * propagated silently rather than throwing. getMonthRange produced daysInMonth: NaN,
+     * the day loop never ran, and the picker rendered a header reading "undefined
+     * undefined" over an empty grid — with no way back, since every later click recomputed
+     * from the same corrupted pair.
+     */
+    _shiftMonth(direction) {
         const dateStr = `${this._displayedYear}-${String(this._displayedMonth).padStart(2, '0')}-01`;
-        const newDate = addMonths(dateStr, -1);
-        this._displayedYear = newDate.year;
-        this._displayedMonth = newDate.month;
-        this._render();
-    }
-
-    _onNextMonth() {
-        const dateStr = `${this._displayedYear}-${String(this._displayedMonth).padStart(2, '0')}-01`;
-        const newDate = addMonths(dateStr, 1);
-        this._displayedYear = newDate.year;
-        this._displayedMonth = newDate.month;
+        const shifted = parseLocalDate(dateStr).add({ months: direction });
+        this._displayedYear = shifted.year;
+        this._displayedMonth = shifted.month;
         this._render();
     }
 

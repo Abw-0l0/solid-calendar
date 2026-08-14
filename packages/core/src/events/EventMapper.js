@@ -162,11 +162,22 @@ export default class EventMapper {
         if (overrides.isTimeBlock) classNames.push('sc-event--timeblock');
         if (groupId) classNames.push('sc-event--group');
 
+        // Resolved before the callback runs, not inside the return literal below.
+        // They used to be computed afterwards, so a resolveEventFields callback reading
+        // mapped.clientName — the obvious thing to reach for, and what the field is named
+        // for — got undefined and rendered a blank line.
+        const resourceOwnerId = this._ownerId(owner);
+        const resourceOwnerName = (owner ? f.resource.name(owner) : '') ?? '';
+        const clientName = (overrides.client ? f.client.name(overrides.client) : '') ?? '';
+        const serviceName = (overrides.service ? f.service.name(overrides.service) : '') ?? '';
+
         const resolveEventFields = this.config.callbacks?.resolveEventFields;
         let textFields = {};
         let badges = [];
         if (typeof resolveEventFields === 'function') {
-            const resolved = resolveEventFields(raw, overrides);
+            const resolved = resolveEventFields(raw, {
+                ...overrides, resourceOwnerId, resourceOwnerName, clientName, serviceName, groupId
+            });
             textFields = resolved?.textFields ?? {};
             badges = resolved?.badges ?? [];
         }
@@ -189,10 +200,10 @@ export default class EventMapper {
             service: overrides.service ?? null,
 
             // Normalised projections, so renderers never touch the raw shape.
-            resourceOwnerId: this._ownerId(owner),
-            resourceOwnerName: (owner ? f.resource.name(owner) : '') ?? '',
-            clientName: (overrides.client ? f.client.name(overrides.client) : '') ?? '',
-            serviceName: (overrides.service ? f.service.name(overrides.service) : '') ?? '',
+            resourceOwnerId,
+            resourceOwnerName,
+            clientName,
+            serviceName,
             groupId,
             /** Exempt from the resource filter — a system or all-resource booking. */
             ignoresResourceFilter: (owner ? f.resource.systemFlag(owner) : false) === true,

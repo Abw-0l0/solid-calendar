@@ -450,10 +450,22 @@ export function addDaysToString(dateString, days) {
     return addDays(dateString, days).toString();
 }
 
+/**
+ * Months clamp to the end of the target month: Jan 31 + 1 month is Feb 28.
+ *
+ * NOTE THE RETURN TYPE. These two return a 'YYYY-MM-DD' string, while addDays returns a
+ * PlainDate and addDaysToString returns a string. That asymmetry — a string-returning
+ * adder with neither a ToString suffix nor an object-returning sibling — is what left
+ * DatePicker reading .year off a string for two releases. For the object form, call
+ * parseLocalDate(s).add({ months }) directly, which is all this does.
+ *
+ * @returns {string} 'YYYY-MM-DD'
+ */
 export function addMonths(dateString, months) {
     return parseLocalDate(dateString).add({ months }).toString();
 }
 
+/** @returns {string} 'YYYY-MM-DD' — see the note on addMonths. */
 export function addYears(dateString, years) {
     return parseLocalDate(dateString).add({ years }).toString();
 }

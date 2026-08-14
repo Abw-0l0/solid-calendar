@@ -3,6 +3,87 @@
 All notable changes to this project are documented here.
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] — 2026-08-15
+
+Four places where a declaration or a documented shape described something no runtime code
+honoured. Each one typechecked, shipped, and failed silently. They were found by building
+a documentation site against the library page by page — reading the declarations next to
+the code that is supposed to implement them.
+
+The common cause is that nothing could catch them. `types.test.js` existed for exactly
+this bug class but only ever asked "is every runtime export declared?", never the reverse;
+badges had no rendering test at all; `DatePicker` had no test of any kind. Those gaps are
+closed here alongside the fixes, so the tests fail against 0.5.0.
+
+### Fixed
+
+- **The date picker's month arrows did nothing.** `temporal.addMonths()` returns a
+  `'YYYY-MM-DD'` string; both handlers read `.year` and `.month` off it. Nothing threw —
+  `undefined` flowed into `getMonthRange`, `daysInMonth` became `NaN`, the day loop never
+  ran, and the picker rendered a header reading `undefined undefined` over a grid with no
+  clickable date. It could not recover without being closed and reopened. The toolbar's own
+  prev/next buttons were never affected.
+
+- **`callbacks.resolveEventFields` received a partial object.** Its second argument is
+  named `mapped`, but the normalised projections were computed *after* the callback ran, so
+  `mapped.clientName`, `mapped.serviceName` and `mapped.resourceOwnerName` were all
+  `undefined` — and a card built from them rendered blank lines. They are now resolved
+  first and passed in, alongside `resourceOwnerId` and `groupId`. Purely additive; nothing
+  the callback already received has changed.
+
+- **`holidays` is now exported from `steadycalendar/headless`.** It had been declared on
+  that subpath since 0.3.0 but never exported from it, so
+  `import { holidays } from 'steadycalendar/headless'` compiled and then threw at runtime.
+  `utils/holidays.js` has no imports of its own, so this costs about 200 bytes gzip and
+  pulls in no new modules.
+
+### Changed
+
+- **BREAKING for TypeScript consumers — the `Badge` declaration was wrong.** It described
+  `{ id, style, bgColor, textColor, text }`; the renderer reads `typeId`, `label`,
+  `tooltip`, `count` and `meta`, and takes every visual property from
+  `config.badgeTypes` instead. The two shapes had no member in common, so a badge written
+  against the declaration typechecked and then rendered nothing at all.
+
+  The declaration now matches the renderer. If your build breaks here, those badges were
+  never appearing:
+
+  ```diff
+  - badges: [{ id: 'status', style: 'filled', bgColor: '#1f2937', text: 'Confirmed' }]
+  + badges: [{ typeId: 'status', label: 'Confirmed' }]
+  ```
+
+  ```js
+  // ...with the appearance moved to config.badgeTypes, keyed by the same id:
+  badgeTypes: { status: { style: 'filled', bgColor: '#1f2937', textColor: '#f9fafb' } }
+  ```
+
+  A badge still needs all three to agree — a `visible` `cardDisplaySettings.badgeItems`
+  entry, a `config.badgeTypes` entry under that id, and a badge whose `typeId` matches.
+  A miss on any of them is skipped silently. The new **Card content** section of the README
+  documents this; `badgeTypes` was previously undocumented everywhere.
+
+- **BREAKING for TypeScript consumers — `CardDisplaySettings.textItems` and
+  `.badgeItems` are now optional**, which is what the renderer always assumed: it guards
+  for the absence of both. Declaring them required forced callers to pass empty arrays.
+
+- `config.badgeTypes` is typed as `Record<string, BadgeType>` rather than
+  `Record<string, any>`, so `style`, `bgColor`, `borderColor`, `maxWidth`,
+  `createIcon()` and `createSecondaryIcon()` are declared for the first time. New exported
+  types: `BadgeType`, `MappedEvent`, `CardDisplayItem`.
+
+### Added
+
+- `tests/cards.test.js` — badge rendering, including the three silent-skip paths and the
+  projections handed to `resolveEventFields`. `_buildBadgeElement` previously had no
+  coverage whatsoever.
+- `tests/datepicker.test.js` — the month arrows, year and leap-year boundaries, and that
+  browsing months does not change the selected date.
+- `tests/types.test.js` asserts declarations and runtime exports match **exactly**, in both
+  directions, for both entry points. The old checks would not have caught `holidays`.
+- The CI `consumer` job imports `holidays` from the packed tarball's `/headless` subpath
+  on Node 18, 20, 22 and 24.
+
 ## [0.5.0] — 2026-08-15
 
 One package. `steadycalendar-pro` is discontinued — it existed because it used to be the

@@ -1,7 +1,7 @@
 /**
  * Headless entry point: state, data and utilities, with no rendering layer.
  *
- * 7.3 kB gzip against 26.8 kB for the package root. Use it when you render the
+ * 8.9 kB gzip against 27.1 kB for the package root. Use it when you render the
  * calendar yourself and only want the scheduling core.
  *
  * CalendarApp is deliberately absent. It statically imports the views, toolbar and
@@ -41,3 +41,7 @@ export { default as PluginManager } from './plugins/PluginManager.js';
 // Utilities
 export * as temporal from './utils/temporal.js';
 export * as ColorUtils from './utils/ColorUtils.js';
+// Pure lookup over plain state and config objects, with no imports of its own — the
+// declarations always claimed it was here, and computing availability without being able
+// to ask whether a date is a holiday was the gap that made the claim worth honouring.
+export * as holidays from './utils/holidays.js';

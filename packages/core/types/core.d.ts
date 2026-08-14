@@ -28,8 +28,19 @@ export interface CalendarPreferences {
 }
 
 export interface CardDisplaySettings {
-    textItems: Array<{ id: string; name: string; visible: boolean; order: number }>;
-    badgeItems: Array<{ id: string; name: string; visible: boolean; order: number }>;
+    /** Omitted entirely, the card falls back to title, time and service. */
+    textItems?: CardDisplayItem[];
+    /** Omitted entirely, no badge is rendered whatever an event carries. */
+    badgeItems?: CardDisplayItem[];
+}
+
+export interface CardDisplayItem {
+    /** Matched against `Badge.typeId`, and against a key of `config.badgeTypes`. */
+    id: string;
+    name: string;
+    visible: boolean;
+    /** Ascending. Decides render order, which is independent of the order of `event.badges`. */
+    order: number;
 }
 
 export interface BusinessHoursEntry { start: string; end: string; }
@@ -140,12 +151,69 @@ export interface CalendarResource {
     holiday_hours?: any[];
 }
 
+/**
+ * A badge on an event, returned from `callbacks.resolveEventFields`.
+ *
+ * Carries content only. Every visual property lives on the matching `BadgeType` in
+ * `config.badgeTypes` instead, so one styling decision covers every event.
+ *
+ * A badge renders only when all three of these agree: `typeId` matches a
+ * `cardDisplaySettings.badgeItems` entry that is `visible`, and `config.badgeTypes` has
+ * an entry under that same id. A miss on either is skipped silently.
+ */
 export interface Badge {
-    id: string;
-    style: string;
+    /** Matched against `CardDisplayItem.id`. Required — a badge without one never renders. */
+    typeId: string;
+    label?: string;
+    /** Becomes the element's `title` attribute. */
+    tooltip?: string;
+    /** Rendered in parentheses after the label. */
+    count?: number;
+    meta?: {
+        /** Draws `BadgeType.createSecondaryIcon()` alongside the primary icon. */
+        showSecondaryIcon?: boolean;
+    };
+}
+
+/** How every badge of a given id looks. Keyed by the same id in `config.badgeTypes`. */
+export interface BadgeType {
+    /** Sets the `sc-event-badge--<style>` class. Defaults to `'filled'`. */
+    style?: 'filled' | 'outlined' | 'icon-only' | (string & {});
     bgColor?: string;
     textColor?: string;
-    text?: string;
+    borderColor?: string;
+    /** In pixels. */
+    maxWidth?: number;
+    /** Returns a node prepended inside the badge. Called once per render. */
+    createIcon?(): Node;
+    /** Used only when the badge sets `meta.showSecondaryIcon`. */
+    createSecondaryIcon?(): Node;
+}
+
+/**
+ * The partially-mapped event handed to `callbacks.resolveEventFields` as its second
+ * argument, alongside the untouched raw record.
+ *
+ * The normalised name projections are resolved before the callback runs, so they are
+ * safe to read here — reach for these rather than digging into `raw`.
+ */
+export interface MappedEvent {
+    title: string;
+    resourceId: string | null;
+    resourceOwner: any | null;
+    /** Absent on a time block. */
+    client?: any | null;
+    /** Absent on a time block. */
+    service?: any | null;
+    color: string;
+    isTimeBlock: boolean;
+    isCancelled: boolean;
+    isSecondaryResourceEvent?: boolean;
+    resourceOwnerId: string | null;
+    resourceOwnerName: string;
+    clientName: string;
+    serviceName: string;
+    groupId: string | null;
 }
 
 export interface InternalEvent {
@@ -243,7 +311,7 @@ export interface CalendarConfig {
     /** Every user-visible string. See DEFAULT_TRANSLATIONS for the keys. */
     translations?: Record<string, string>;
     callbacks?: {
-        resolveEventFields?: (raw: any, mapped: any) => { textFields?: Record<string, string>; badges?: Badge[] };
+        resolveEventFields?: (raw: any, mapped: MappedEvent) => { textFields?: Record<string, string>; badges?: Badge[] };
         fetchPreferences?: (contextId: string) => Promise<{ success: boolean; preferences?: CalendarPreferences }>;
         savePreferences?: (contextId: string, prefs: CalendarPreferences) => Promise<void>;
         onEventClick?: (event: InternalEvent) => void;
@@ -252,7 +320,8 @@ export interface CalendarConfig {
         onCardSettingsClick?: () => void;
         onPrint?: () => void;
     };
-    badgeTypes?: Record<string, any>;
+    /** Keyed by `CardDisplayItem.id`. A badge with no entry here is not rendered. */
+    badgeTypes?: Record<string, BadgeType>;
     privacySuppression?: { textFieldIds?: string[]; badgeIds?: string[] };
 }
 
