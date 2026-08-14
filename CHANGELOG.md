@@ -3,7 +3,7 @@
 All notable changes to this project are documented here.
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.0] — 2026-08-14
+## [0.5.0] — 2026-08-15
 
 One package. `steadycalendar-pro` is discontinued — it existed because it used to be the
 paid tier under the Elastic License 2.0, and once it was relicensed MIT in 0.2.0 the split
