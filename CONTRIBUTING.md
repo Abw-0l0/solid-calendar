@@ -6,7 +6,7 @@ Thanks for looking. Issues, questions and pull requests are all welcome — incl
 ## Setup
 
 ```bash
-npm install          # workspaces: packages/core, packages/pro
+npm install          # one workspace: packages/core
 npm run build        # esbuild -> dist/ for both packages
 npm test             # vitest
 ```

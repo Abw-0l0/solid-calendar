@@ -30,8 +30,6 @@ In scope:
 Out of scope:
 
 - Vulnerabilities in a host application's own API, auth, or CSP.
-- `@holiday-jp/holiday_jp`, the one runtime dependency of `steadycalendar-pro` —
-  report those upstream.
 - Denial of service from deliberately pathological input volumes (rendering ten thousand
   overlapping events will be slow; that is not a security boundary).
 

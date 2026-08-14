@@ -4,7 +4,7 @@ A resource-scheduling calendar for booking and appointment apps, in vanilla Java
 
 Built for, and proven in, a commercial booking product at scale — then generalised, so the shape of your data and the words on screen are your choice, not the calendar's.
 
-![license](https://img.shields.io/badge/license-MIT-blue) ![bundle](https://img.shields.io/badge/bundle-26.7%20kB%20gzip-informational) ![dependencies](https://img.shields.io/badge/runtime%20deps-0-brightgreen) ![tests](https://img.shields.io/badge/tests-250%20passing-brightgreen)
+![license](https://img.shields.io/badge/license-MIT-blue) ![bundle](https://img.shields.io/badge/bundle-27.1%20kB%20gzip-informational) ![dependencies](https://img.shields.io/badge/runtime%20deps-0-brightgreen) ![tests](https://img.shields.io/badge/tests-246%20passing-brightgreen)
 
 ![The calendar rendering a day view with three resource columns, overlapping bookings, a time block and business-hours shading](docs/screenshot.png)
 
@@ -26,22 +26,11 @@ The trade was a bigger bundle in exchange for less control over the part of the 
 
 ## Install
 
-Not published to npm yet — `npm install steadycalendar` will 404. Build from source:
-
 ```bash
-git clone https://github.com/Abw-0l0/steady-calendar.git
-cd steady-calendar
-npm install
-npm run build
+npm install steadycalendar
 ```
 
-Then pack the workspace and install the tarball into your project:
-
-```bash
-npm pack -w packages/core          # -> steadycalendar-0.4.0.tgz
-cd ../your-app
-npm install ../steady-calendar/steadycalendar-0.4.0.tgz
-```
+One package, no runtime dependencies, nothing else to install.
 
 | Entry point | Artifact |
 |---|---|
@@ -232,7 +221,7 @@ Renderers never see your raw shape. Each event carries `resourceOwnerId`, `resou
 
 ### Exports
 
-`CalendarApp`, `EventBus`, `CalendarState`, `DataBridge`, `PreferencesBridge`, `EventMapper`, `PluginManager`; the `temporal`, `ColorUtils` and `holidays` namespaces; `DEFAULT_FIELD_MAP`, `HEALTHCARE_FIELD_MAP`, `DEFAULT_TRANSLATIONS`, `JA_TRANSLATIONS`, `translate`; and the grid constants.
+`CalendarApp`, `EventBus`, `CalendarState`, `DataBridge`, `PreferencesBridge`, `EventMapper`, `PluginManager`, `DragPersistencePlugin`; the `temporal`, `ColorUtils` and `holidays` namespaces; `DEFAULT_FIELD_MAP`, `HEALTHCARE_FIELD_MAP`, `DEFAULT_TRANSLATIONS`, `JA_TRANSLATIONS`, `translate`; and the grid constants.
 
 The rendering classes are exported too — `ViewManager`, `CalendarToolbar`, `EventRenderer`, the four views and the five interaction handlers — so you can compose your own shell. Each takes `(state, bus, config)` and exposes `init(container)` / `destroy()`. Internal column builders are deliberately not exported; their contracts are not stable.
 
@@ -255,7 +244,61 @@ calendar.bus.on('event:drop', async ({ event, newDate, newTime, newResourceId, r
 });
 ```
 
-`steadycalendar-pro` packages this as `DragPersistencePlugin`, with `canDrop` / `canResize` guards.
+`DragPersistencePlugin` ships this ready-made, adding `canDrop` / `canResize` guards and
+`blockedStatuses`.
+
+### Public holidays
+
+The library ships no holiday data for any country. A calendar used worldwide has no
+business privileging one, and the data changes yearly — so it comes from you, by whichever
+of the three routes fits.
+
+Simplest, a date-to-name map on `config.holidays`:
+
+```js
+new CalendarApp({
+  holidays: {
+    '2026-01-01': 'New Year's Day',
+    '2026-05-01': 'Labour Day',
+  },
+});
+```
+
+For a live source or a holiday package, implement `HolidayProvider`. Anything registered
+in `plugins` that exposes `getHoliday` is adopted as `config.holidayProvider`
+automatically:
+
+```js
+import holiday_jp from '@holiday-jp/holiday_jp';
+
+class JapaneseHolidays {
+  name = 'japanese-holidays';
+
+  getHoliday(dateStr) {
+    const year = Number(dateStr.slice(0, 4));
+    // holiday_jp stores each date at UTC midnight, so the range and the keys must be
+    // read in UTC too. Local getters shift every holiday back a day under a negative
+    // UTC offset — New Year's Day becomes 31 December and falls outside the year.
+    const found = holiday_jp.between(new Date(Date.UTC(year, 0, 1)), new Date(Date.UTC(year, 11, 31)));
+    const hit = found.find((h) => utcKey(h.date) === dateStr);
+    return hit ? { name: hit.name, name_en: hit.name_en } : null;
+  }
+
+  getHolidayName(dateStr, locale) {
+    const h = this.getHoliday(dateStr);
+    if (!h) return '';
+    return locale === 'ja-JP' ? h.name : (h.name_en ?? h.name);
+  }
+}
+
+const utcKey = (d) => new Date(d).toISOString().slice(0, 10);
+
+new CalendarApp({ plugins: [new JapaneseHolidays()] });
+```
+
+`getHoliday` returns `null` for an ordinary day. Cache per year if your source is
+expensive — the calendar calls it once per rendered date. An optional `preload(start, end)`
+is called when the visible range changes, which is the hook to warm that cache.
 
 ### Computing free slots headlessly
 
@@ -306,9 +349,9 @@ From a clean `npm run build`, gzip level 9:
 
 | Artifact | Raw | Gzip |
 |---|---|---|
-| `calendar.global.min.js` — everything, `<script>`-ready | 111.9 kB | **26.7 kB** |
-| `calendar.esm.min.js` — everything, for bundlers | 111.4 kB | 26.5 kB |
-| `calendar.headless.min.js` — state and data only | 26.8 kB | 8.7 kB |
+| `calendar.global.min.js` — everything, `<script>`-ready | 113.6 kB | **27.1 kB** |
+| `calendar.esm.min.js` — everything, for bundlers | 113.2 kB | 26.9 kB |
+| `calendar.headless.min.js` — state and data only | 26.9 kB | 8.7 kB |
 | `calendar.css` | 28.4 kB | 5.0 kB |
 
 Reproduce with `npm run size -w packages/core`. The build fails if the browser bundle passes 40 kB gzip.
@@ -316,7 +359,7 @@ Reproduce with `npm run size -w packages/core`. The build fails if the browser b
 ## Testing
 
 ```bash
-npm test              # 250 tests
+npm test              # 246 tests
 npm run lint
 npm run check:imports # resolves every module, not just what index.js reaches
 npm run test:smoke    # loads the <script> artifact in a bare context
@@ -332,15 +375,6 @@ Several guards exist because of specific failures this codebase had:
 CI runs build, lint, typecheck, tests and both artifact checks on Node 18/20/22 across Linux, Windows and macOS, plus the whole suite under six timezones, coverage, and CodeQL.
 
 jsdom has no layout engine, so it proves structure, not appearance. `examples/index.html` is the human check.
-
-## Packages
-
-| Package | Contents |
-|---|---|
-| `packages/core` — `steadycalendar` | The calendar. Zero runtime dependencies. |
-| `packages/pro` — `steadycalendar-pro` | `DragPersistencePlugin` and `JapaneseHolidayProvider`. Depends on `@holiday-jp/holiday_jp`. |
-
-Both MIT.
 
 ## Contributing
 

@@ -1,6 +1,6 @@
 # steadycalendar
 
-A resource-scheduling calendar for booking and appointment apps. Vanilla JavaScript, zero runtime dependencies, 26.7 kB gzipped.
+A resource-scheduling calendar for booking and appointment apps. Vanilla JavaScript, zero runtime dependencies, 27.1 kB gzipped.
 
 Built for, and proven in, a commercial booking product at scale — then generalised so the shape of your data is your choice, not the calendar's.
 
@@ -95,8 +95,8 @@ new CalendarApp({ locale: 'ja-JP', translations: JA_TRANSLATIONS, /* … */ });
 
 | Import | What you get |
 |---|---|
-| `steadycalendar` | The calendar. 26.7 kB gzip. |
-| `steadycalendar/headless` | State, data and date utilities, no DOM. 7.2 kB gzip. |
+| `steadycalendar` | The calendar. 27.1 kB gzip. |
+| `steadycalendar/headless` | State, data and date utilities, no DOM. 8.7 kB gzip. |
 | `steadycalendar/styles` | The stylesheet. |
 
 A `<script>` build is published too — `dist/calendar.global.min.js` exposes `window.SteadyCalendar` and needs no loader.

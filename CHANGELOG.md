@@ -3,6 +3,48 @@
 All notable changes to this project are documented here.
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] — 2026-08-14
+
+One package. `steadycalendar-pro` is discontinued — it existed because it used to be the
+paid tier under the Elastic License 2.0, and once it was relicensed MIT in 0.2.0 the split
+had no purpose left. It contained 195 lines.
+
+### Changed
+
+- **BREAKING — `steadycalendar-pro` is gone.** `DragPersistencePlugin` now ships in
+  `steadycalendar` itself. Drop the second install and change the import:
+
+  ```diff
+  - import { DragPersistencePlugin } from 'steadycalendar-pro';
+  + import { DragPersistencePlugin } from 'steadycalendar';
+  ```
+
+  The plugin's behaviour, options and types are unchanged. `steadycalendar-pro@0.4.0`
+  stays on npm and keeps working; it is deprecated, not unpublished.
+
+- **BREAKING — `JapaneseHolidayProvider` is removed**, and with it the
+  `@holiday-jp/holiday_jp` dependency. Shipping one country's holiday data in a calendar
+  used everywhere was a leftover from the product this was extracted from. Holidays were
+  always configurable; the provider was a convenience wrapper, not a capability. Replace it
+  with a date-to-name map:
+
+  ```js
+  new CalendarApp({ holidays: { '2026-01-01': 'New Year's Day' } });
+  ```
+
+  or keep using `holiday_jp` directly — the README's **Public holidays** recipe has the
+  full provider, including the UTC handling that a naive version gets wrong.
+
+- The browser bundle is 27.1 kB gzip, up from 26.7 kB, because drag persistence is now
+  included rather than a separate install.
+- Releases are published with **trusted publishing (OIDC)**. There is no npm token stored
+  in the repository any more, and no token fallback in the release workflow — npm falls
+  back silently when one is present, which would have hidden a broken setup until
+  bypass-2FA tokens lose publishing rights in January 2027.
+
+The package still has **zero runtime dependencies**, which the removal above is what
+preserves.
+
 ## [0.4.0] — 2026-08-14
 
 Renamed to **SteadyCalendar**. The previous name could not be published: npm rejected it
@@ -253,4 +295,5 @@ Initial version. Never published to npm.
   artifact was an ESM file with a bare import, so it could never load.
 - Root `npm test` failed: `packages/pro` had a test script and no test files.
 
+[0.5.0]: https://github.com/Abw-0l0/steady-calendar/releases/tag/v0.5.0
 [0.4.0]: https://github.com/Abw-0l0/steady-calendar/releases/tag/v0.4.0
