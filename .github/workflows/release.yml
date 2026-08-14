@@ -108,9 +108,13 @@ jobs:
       #
       # Not gated on any secret existing. A tag was pushed, so a publish was intended, and
       # failing loudly beats reporting success having shipped nothing.
+      # Diagnosing an auth failure here: add --loglevel verbose. npm's OIDC helper is
+      # written never to throw, so a rejected exchange returns quietly and the publish
+      # fails later as ENEEDAUTH or a 404 that names neither OIDC nor the reason. At
+      # verbose level it prints the exchange status and the registry's own message.
       - name: Publish steadycalendar
         if: github.event_name == 'push' || inputs.publish
-        run: npm publish --provenance --access public -w packages/core --loglevel verbose
+        run: npm publish --provenance --access public -w packages/core
 
       # Only reached when the publish above succeeded, so the wording is safe.
       - name: Create the GitHub release
