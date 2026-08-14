@@ -63,15 +63,17 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.inputs.tag || github.ref }}
-      # Deliberately NO registry-url. It makes setup-node write an .npmrc holding an
-      # _authToken line interpolated from NODE_AUTH_TOKEN; with no token set that resolves
-      # to an empty credential, npm treats auth as already configured, never attempts the
-      # OIDC exchange, and the publish fails 404 unauthenticated. npm targets the public
-      # registry by default anyway.
+      # registry-url is required, and matches npm's documented trusted-publishing setup.
+      # It writes an .npmrc with an _authToken line interpolated from NODE_AUTH_TOKEN,
+      # which is unset here. That is harmless when OIDC succeeds, because npm exchanges
+      # the GitHub ID token for a real one first and never reads the placeholder. If OIDC
+      # is NOT attempted, that placeholder is what turns a clear ENEEDAUTH into a
+      # confusing 404 — see the preconditions step below when diagnosing.
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
+          registry-url: https://registry.npmjs.org
 
       # Node 22 ships npm 10, which predates OIDC support. Trusted publishing needs
       # 11.5.1+; without this the publish fails outright, because there is no longer a
