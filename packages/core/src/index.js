@@ -15,6 +15,7 @@ export { default as EventMapper } from './events/EventMapper.js';
 
 // Plugins
 export { default as PluginManager } from './plugins/PluginManager.js';
+export { default as DragPersistencePlugin } from './plugins/DragPersistencePlugin.js';
 
 // Utilities
 export * as temporal from './utils/temporal.js';

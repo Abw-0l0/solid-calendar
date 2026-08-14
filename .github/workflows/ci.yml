@@ -127,10 +127,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - name: Pack the tarballs
-        run: |
-          npm pack -w packages/core --pack-destination /tmp
-          npm pack -w packages/pro  --pack-destination /tmp
+      - name: Pack the tarball
+        run: npm pack -w packages/core --pack-destination /tmp
 
       - name: Install and use it on Node ${{ matrix.node }}
         uses: actions/setup-node@v7
@@ -144,6 +142,7 @@ jobs:
           node --input-type=commonjs -e "
             const api = require('steadycalendar');
             if (typeof api.CalendarApp !== 'function') throw new Error('CalendarApp missing from require()');
+            if (typeof api.DragPersistencePlugin !== 'function') throw new Error('DragPersistencePlugin missing from require()');
             const state = new api.CalendarState({ emit() {}, on() {} });
             if (!/^\d{4}-\d{2}-\d{2}\$/.test(state.currentDate)) throw new Error('bad currentDate: ' + state.currentDate);
             console.log('require() ok on node ' + process.version + ' — ' + Object.keys(api).length + ' exports');

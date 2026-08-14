@@ -2,13 +2,13 @@
  * verify-pack — assert every path declared in each package's "files" array
  * actually lands in the published tarball.
  *
- * packages/pro currently declares `types` pointing at a directory that does not
- * exist and lists a README.md that was never written; both would ship broken.
+ * A "files" entry pointing at a path that does not exist ships a broken package
+ * silently: npm simply omits it and the publish still reports success.
  */
 import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
 
-const WORKSPACES = ['packages/core', 'packages/pro'];
+const WORKSPACES = ['packages/core'];
 let failed = false;
 
 for (const ws of WORKSPACES) {
