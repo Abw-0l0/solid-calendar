@@ -1,0 +1,396 @@
+/*
+ * Docs shell styling.
+ *
+ * The site is themed with SteadyCalendar's own `--sc-*` custom properties rather than a
+ * parallel set of its own. That is deliberate: the theming page changes these values
+ * live, and because the chrome reads the same tokens, you watch the whole site restyle
+ * along with the calendar. It also keeps the demo honest — if a token is not enough to
+ * theme something, it shows up here first.
+ *
+ * `calendar.css` is loaded before this file (see angular.json) and defines the tokens on
+ * :root. Everything below either consumes them or adds a doc-only token under --doc-*.
+ */
+
+:root {
+  --doc-sidebar-width: 260px;
+  --doc-header-height: 56px;
+  --doc-max-width: 1180px;
+  --doc-radius: 8px;
+  --doc-code-bg: #1e293b;
+  --doc-code-text: #e2e8f0;
+  --doc-code-comment: #94a3b8;
+  --doc-code-keyword: #c4b5fd;
+  --doc-code-string: #86efac;
+  --doc-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/*
+ * Dark theme, applied by overriding the library's tokens — no separate stylesheet and no
+ * changes inside calendar.css. This is the whole theming story in one block, and it is
+ * why the token list is a public API.
+ */
+[data-theme='dark'] {
+  --sc-bg: #0f172a;
+  --sc-bg-alt: #1e293b;
+  --sc-border: #334155;
+  --sc-border-light: #1e293b;
+  --sc-text: #e2e8f0;
+  --sc-text-secondary: #94a3b8;
+  --sc-text-muted: #64748b;
+  --sc-primary: #60a5fa;
+  --sc-primary-hover: #93c5fd;
+  --sc-today-bg: #1e3a5f;
+  --sc-non-business-bg: rgba(15, 23, 42, 0.6);
+  --sc-selection-bg: rgba(96, 165, 250, 0.2);
+  --sc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --sc-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --sc-shadow-dropdown: 0 10px 15px rgba(0, 0, 0, 0.6);
+  --doc-code-bg: #020617;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--sc-font-family, system-ui, -apple-system, "Segoe UI", sans-serif);
+  background: var(--sc-bg);
+  color: var(--sc-text);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--sc-primary);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.25;
+  margin: 0 0 0.5em;
+  font-weight: 650;
+  letter-spacing: -0.011em;
+}
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.35rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sc-border-light);
+}
+h3 {
+  font-size: 1.05rem;
+  margin-top: 1.75rem;
+}
+p {
+  margin: 0 0 1rem;
+}
+code {
+  font-family: var(--doc-mono);
+  font-size: 0.875em;
+  background: var(--sc-bg-alt);
+  border: 1px solid var(--sc-border-light);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+
+/* --- Layout --------------------------------------------------------------- */
+
+.doc-shell {
+  display: grid;
+  grid-template-columns: var(--doc-sidebar-width) 1fr;
+  min-height: 100vh;
+}
+
+.doc-sidebar {
+  border-right: 1px solid var(--sc-border);
+  background: var(--sc-bg-alt);
+  padding: 1.25rem 0 3rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.doc-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 1.25rem 1rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--sc-text);
+}
+.doc-brand:hover {
+  text-decoration: none;
+}
+.doc-brand-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--sc-primary);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 15px;
+  flex: none;
+}
+.doc-brand-version {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--sc-text-secondary);
+  border: 1px solid var(--sc-border);
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+}
+
+.doc-nav-group {
+  padding: 0.75rem 1.25rem 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--sc-text-muted);
+}
+.doc-nav a {
+  display: block;
+  padding: 0.32rem 1.25rem;
+  color: var(--sc-text-secondary);
+  border-left: 2px solid transparent;
+  font-size: 0.9rem;
+}
+.doc-nav a:hover {
+  color: var(--sc-text);
+  text-decoration: none;
+  background: color-mix(in srgb, var(--sc-primary) 7%, transparent);
+}
+.doc-nav a.active {
+  color: var(--sc-primary);
+  border-left-color: var(--sc-primary);
+  background: color-mix(in srgb, var(--sc-primary) 10%, transparent);
+  font-weight: 600;
+}
+
+.doc-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.doc-topbar {
+  height: var(--doc-header-height);
+  border-bottom: 1px solid var(--sc-border-light);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  background: color-mix(in srgb, var(--sc-bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  z-index: 40;
+}
+
+.doc-content {
+  padding: 2rem 2.5rem 5rem;
+  max-width: var(--doc-max-width);
+  width: 100%;
+}
+.doc-content--wide {
+  max-width: none;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.doc-lead {
+  font-size: 1.075rem;
+  color: var(--sc-text-secondary);
+  margin-bottom: 2rem;
+}
+
+/* --- Controls ------------------------------------------------------------- */
+
+.btn {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid var(--sc-border);
+  background: var(--sc-bg);
+  color: var(--sc-text);
+  cursor: pointer;
+  transition: background var(--sc-transition-fast), border-color var(--sc-transition-fast);
+}
+.btn:hover {
+  background: var(--sc-bg-alt);
+  border-color: var(--sc-primary);
+}
+.btn--primary {
+  background: var(--sc-primary);
+  border-color: var(--sc-primary);
+  color: #fff;
+}
+.btn--primary:hover {
+  background: var(--sc-primary-hover);
+  border-color: var(--sc-primary-hover);
+}
+.btn--active {
+  background: var(--sc-primary);
+  border-color: var(--sc-primary);
+  color: #fff;
+}
+
+label.field {
+  display: block;
+  margin-bottom: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sc-text-secondary);
+}
+label.field > span {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+select,
+input[type='text'],
+input[type='date'],
+input[type='number'] {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 400;
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--sc-border);
+  background: var(--sc-bg);
+  color: var(--sc-text);
+}
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--sc-text);
+  margin-bottom: 0.45rem;
+  cursor: pointer;
+}
+.checkbox input {
+  accent-color: var(--sc-primary);
+  margin: 0;
+}
+
+/* --- Content blocks ------------------------------------------------------- */
+
+.note {
+  border-left: 3px solid var(--sc-primary);
+  background: color-mix(in srgb, var(--sc-primary) 7%, transparent);
+  padding: 0.75rem 1rem;
+  border-radius: 0 var(--doc-radius) var(--doc-radius) 0;
+  margin: 1.25rem 0;
+  font-size: 0.92rem;
+}
+.note--warn {
+  border-left-color: var(--sc-warning);
+  background: color-mix(in srgb, var(--sc-warning) 10%, transparent);
+}
+.note--danger {
+  border-left-color: var(--sc-danger);
+  background: color-mix(in srgb, var(--sc-danger) 9%, transparent);
+}
+.note strong:first-child {
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+table.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin: 1.25rem 0;
+}
+table.doc-table th,
+table.doc-table td {
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--sc-border-light);
+  vertical-align: top;
+}
+table.doc-table th {
+  font-weight: 650;
+  color: var(--sc-text-secondary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom-color: var(--sc-border);
+}
+table.doc-table td code {
+  white-space: nowrap;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 0.85rem;
+  margin: 1.5rem 0;
+}
+.card {
+  border: 1px solid var(--sc-border-light);
+  border-radius: var(--doc-radius);
+  padding: 0.9rem 1rem;
+  background: var(--sc-bg-alt);
+}
+.card h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.92rem;
+}
+.card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--sc-text-secondary);
+}
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1rem 0;
+}
+
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .doc-shell {
+    grid-template-columns: 1fr;
+  }
+  .doc-sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--sc-border);
+  }
+  .doc-content {
+    padding: 1.5rem 1.15rem 4rem;
+  }
+}
