@@ -1,7 +1,7 @@
 /**
- * solidcalendar-pro — TypeScript declarations
+ * steadycalendar-pro — TypeScript declarations
  */
-import type { CalendarPlugin, HolidayProvider, InternalEvent } from 'solidcalendar';
+import type { CalendarPlugin, HolidayProvider, InternalEvent } from 'steadycalendar';
 
 export interface DragChanges {
     date: string;

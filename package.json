@@ -1,5 +1,5 @@
 {
-  "name": "solidcalendar-monorepo",
+  "name": "steadycalendar-monorepo",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -31,10 +31,10 @@
   "engines": {
     "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
   },
-  "description": "Monorepo for SolidCalendar — a dependency-free resource scheduling calendar.",
+  "description": "Monorepo for SteadyCalendar — a dependency-free resource scheduling calendar.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Abw-0l0/solid-calendar.git"
+    "url": "git+https://github.com/Abw-0l0/steady-calendar.git"
   },
   "license": "MIT",
   "author": "Abdul Basit Iqbal",

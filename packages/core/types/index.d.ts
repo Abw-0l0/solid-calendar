@@ -1,8 +1,8 @@
 /**
- * solidcalendar — TypeScript declarations
+ * steadycalendar — TypeScript declarations
  *
  * The package root: the scheduling core plus the rendering layer. For state and data
- * with no DOM, import from `solidcalendar/headless` instead.
+ * with no DOM, import from `steadycalendar/headless` instead.
  */
 
 export * from './core.js';

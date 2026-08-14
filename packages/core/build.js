@@ -25,7 +25,7 @@ const common = {
  * each consumer gets an artifact that does one job properly:
  *   .esm.js    bundlers and `import`
  *   .cjs       `require()` — the extension is required, since package.json is type:module
- *   .global.js a real <script> tag, self-contained, exposing window.SolidCalendar
+ *   .global.js a real <script> tag, self-contained, exposing window.SteadyCalendar
  */
 const targets = [
     // Headless: the pre-rendering surface, for hosts that draw the calendar themselves.
@@ -34,8 +34,8 @@ const targets = [
     { outfile: 'dist/calendar.esm.js', format: 'esm', sourcemap: true },
     { outfile: 'dist/calendar.esm.min.js', format: 'esm', minify: true },
     { outfile: 'dist/calendar.cjs', format: 'cjs', sourcemap: true },
-    { outfile: 'dist/calendar.global.js', format: 'iife', globalName: 'SolidCalendar', sourcemap: true },
-    { outfile: 'dist/calendar.global.min.js', format: 'iife', globalName: 'SolidCalendar', minify: true },
+    { outfile: 'dist/calendar.global.js', format: 'iife', globalName: 'SteadyCalendar', sourcemap: true },
+    { outfile: 'dist/calendar.global.min.js', format: 'iife', globalName: 'SteadyCalendar', minify: true },
 ];
 
 function report(file) {

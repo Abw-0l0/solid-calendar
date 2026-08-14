@@ -8,11 +8,11 @@ export default class PluginManager {
 
     register(plugin, context) {
         if (!plugin?.name) {
-            console.error('[SolidCalendar:PluginManager] Plugin must have a name');
+            console.error('[SteadyCalendar:PluginManager] Plugin must have a name');
             return;
         }
         if (this._plugins.has(plugin.name)) {
-            console.warn(`[SolidCalendar:PluginManager] Plugin '${plugin.name}' already registered`);
+            console.warn(`[SteadyCalendar:PluginManager] Plugin '${plugin.name}' already registered`);
             return;
         }
         this._plugins.set(plugin.name, plugin);

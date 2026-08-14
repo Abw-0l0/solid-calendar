@@ -70,7 +70,7 @@ export default class ViewManager {
         const ViewConstructor = VIEW_REGISTRY[viewType];
 
         if (!ViewConstructor) {
-            console.error(`[SolidCalendar:ViewManager] Unknown view type: ${viewType}`);
+            console.error(`[SteadyCalendar:ViewManager] Unknown view type: ${viewType}`);
             return;
         }
 

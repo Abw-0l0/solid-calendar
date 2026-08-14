@@ -59,7 +59,7 @@ export default class DataBridge {
             this._staticTimestamp = now;
             return data;
         } catch (err) {
-            console.error('[SolidCalendar:DataBridge] Failed to load static data:', err);
+            console.error('[SteadyCalendar:DataBridge] Failed to load static data:', err);
             throw err;
         } finally {
             this.state.setLoading(false);
@@ -75,7 +75,7 @@ export default class DataBridge {
             const events = this._eventMapper.mapAll(rawEvents);
             this.state.setEvents(events);
         } catch (err) {
-            console.error('[SolidCalendar:DataBridge] Failed to load events:', err);
+            console.error('[SteadyCalendar:DataBridge] Failed to load events:', err);
         } finally {
             this.state.setLoading(false);
         }

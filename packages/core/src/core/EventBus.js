@@ -71,7 +71,7 @@ export default class EventBus {
             try {
                 handler(data);
             } catch (err) {
-                console.error(`[SolidCalendar:EventBus] Error in handler for '${event}':`, err);
+                console.error(`[SteadyCalendar:EventBus] Error in handler for '${event}':`, err);
             }
         }
     }

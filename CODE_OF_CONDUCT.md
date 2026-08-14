@@ -35,7 +35,7 @@ an individual is officially representing the project in public spaces.
 ## Enforcement
 
 Report unacceptable behaviour to the maintainer via a
-[private security advisory](https://github.com/Abw-0l0/solid-calendar/security/advisories/new)
+[private security advisory](https://github.com/Abw-0l0/steady-calendar/security/advisories/new)
 or by direct message on GitHub. All complaints will be reviewed and investigated
 promptly and fairly, and the reporter's privacy and security will be respected.
 

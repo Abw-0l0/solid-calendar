@@ -12,8 +12,8 @@ const common = {
     banner: { js: `/*! ${pkg.name} v${pkg.version} | MIT | ${pkg.homepage} */` },
 };
 
-// solidcalendar is a peer dependency and must stay external everywhere.
-const PEER = ['solidcalendar'];
+// steadycalendar is a peer dependency and must stay external everywhere.
+const PEER = ['steadycalendar'];
 
 /**
  * @holiday-jp/holiday_jp is a real runtime dependency, so bundler-facing builds leave it
@@ -29,14 +29,14 @@ const targets = [
     {
         outfile: 'dist/calendar-pro.global.js',
         format: 'iife',
-        globalName: 'SolidCalendarPro',
+        globalName: 'SteadyCalendarPro',
         sourcemap: true,
         external: PEER,
     },
     {
         outfile: 'dist/calendar-pro.global.min.js',
         format: 'iife',
-        globalName: 'SolidCalendarPro',
+        globalName: 'SteadyCalendarPro',
         minify: true,
         external: PEER,
     },

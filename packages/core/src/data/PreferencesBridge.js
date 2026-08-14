@@ -31,7 +31,7 @@ export default class PreferencesBridge {
             const result = await fetchFn(contextId);
             if (result.success && result.preferences) this.state.applyPreferences(result.preferences);
         } catch (err) {
-            console.error('[SolidCalendar:PreferencesBridge] Failed to load preferences:', err);
+            console.error('[SteadyCalendar:PreferencesBridge] Failed to load preferences:', err);
         }
     }
 
@@ -48,7 +48,7 @@ export default class PreferencesBridge {
         try {
             await saveFn(contextId, this.state.toPreferences());
         } catch (err) {
-            console.error('[SolidCalendar:PreferencesBridge] Failed to save preferences:', err);
+            console.error('[SteadyCalendar:PreferencesBridge] Failed to save preferences:', err);
         }
     }
 

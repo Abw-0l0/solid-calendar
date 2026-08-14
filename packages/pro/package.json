@@ -1,7 +1,7 @@
 {
-  "name": "solidcalendar-pro",
-  "version": "0.3.0",
-  "description": "Optional plugins for solidcalendar — drag persistence and Japanese holidays",
+  "name": "steadycalendar-pro",
+  "version": "0.4.0",
+  "description": "Optional plugins for steadycalendar — drag persistence and Japanese holidays",
   "type": "module",
   "main": "./dist/calendar-pro.cjs",
   "module": "./dist/calendar-pro.esm.js",
@@ -29,7 +29,7 @@
     "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "peerDependencies": {
-    "solidcalendar": "^0.3.0"
+    "steadycalendar": "^0.4.0"
   },
   "dependencies": {
     "@holiday-jp/holiday_jp": "^2.5.1"
@@ -46,7 +46,7 @@
   "author": "Abdul Basit Iqbal",
   "license": "MIT",
   "keywords": [
-    "solidcalendar",
+    "steadycalendar",
     "calendar",
     "scheduler",
     "drag-drop",
@@ -56,14 +56,14 @@
   "browser": "./dist/calendar-pro.global.min.js",
   "unpkg": "./dist/calendar-pro.global.min.js",
   "sideEffects": false,
-  "homepage": "https://github.com/Abw-0l0/solid-calendar/tree/main/packages/pro#readme",
+  "homepage": "https://github.com/Abw-0l0/steady-calendar/tree/main/packages/pro#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Abw-0l0/solid-calendar.git",
+    "url": "git+https://github.com/Abw-0l0/steady-calendar.git",
     "directory": "packages/pro"
   },
   "bugs": {
-    "url": "https://github.com/Abw-0l0/solid-calendar/issues"
+    "url": "https://github.com/Abw-0l0/steady-calendar/issues"
   },
   "jsdelivr": "./dist/calendar-pro.global.min.js"
 }

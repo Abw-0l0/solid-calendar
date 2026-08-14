@@ -233,7 +233,7 @@ function resolveEnvTimezone() {
     // Node, SSR and build-time only; guarded so browser bundles never touch `process`.
     // config.timezone takes precedence over this.
     if (typeof process !== 'undefined' && process?.env) {
-        return process.env.SOLIDCALENDAR_TIMEZONE || null;
+        return process.env.STEADYCALENDAR_TIMEZONE || null;
     }
     return null;
 }
@@ -274,7 +274,7 @@ export function setDefaultTimezone(timeZone) {
         return _defaultTimezone;
     }
     if (!isValidTimezone(timeZone)) {
-        console.warn(`[SolidCalendar:temporal] Unknown timezone "${timeZone}"; keeping "${_defaultTimezone}".`);
+        console.warn(`[SteadyCalendar:temporal] Unknown timezone "${timeZone}"; keeping "${_defaultTimezone}".`);
         return _defaultTimezone;
     }
     _defaultTimezone = timeZone;
