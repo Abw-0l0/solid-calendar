@@ -1,9 +1,22 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import type { CalendarConfig } from 'steadycalendar';
+import type { Badge, CalendarConfig, MappedEvent } from 'steadycalendar';
+import { temporal } from 'steadycalendar';
 import { ScCalendarComponent } from '../calendar/sc-calendar.component';
 import { CodeBlockComponent } from '../shell/code-block.component';
 import { DemoFrameComponent } from '../shell/demo-frame.component';
 import { demoDataSource } from '../data';
+
+/** Every booking gets a length badge; completed ones also get a status badge. */
+function buildBadges(raw: any): Badge[] {
+  const badges: Badge[] = [];
+  if (raw?.status === 'Completed') {
+    badges.push({ typeId: 'status', label: 'Done', tooltip: 'Marked complete' });
+  }
+  if (raw?.start_time && raw?.end_time && !raw?.title) {
+    badges.push({ typeId: 'length', label: `${temporal.timeDiff(raw.start_time, raw.end_time)}m` });
+  }
+  return badges;
+}
 
 @Component({
   selector: 'page-cards',
@@ -74,13 +87,18 @@ import { demoDataSource } from '../data';
       </p>
 
       <h2>Badges</h2>
-      <div class="note note--danger">
-        <strong>The shipped type declaration for <code>Badge</code> does not match what the renderer reads.</strong>
-        <code>types/core.d.ts</code> declares <code>&#123; id, style, bgColor, textColor, text &#125;</code>,
-        but <code>EventContentBuilder</code> reads <code>typeId</code>, <code>label</code>,
-        <code>tooltip</code>, <code>count</code> and <code>meta</code>, taking every visual property from
-        <code>config.badgeTypes</code> instead. A badge authored against the declaration typechecks and then
-        renders nothing. Verified against 0.5.0 — the working shape is below.
+      <p>
+        A badge carries <em>content</em>; <code>config.badgeTypes</code> carries its <em>appearance</em>. The
+        split means one styling decision covers every event that shows that badge, rather than each event
+        repeating its own colours.
+      </p>
+      <div class="note">
+        <strong>Requires 0.6.0 or later.</strong>
+        Through 0.5.0 the <code>Badge</code> declaration described
+        <code>&#123; id, style, bgColor, textColor, text &#125;</code> — a shape sharing no member with what
+        the renderer actually reads, so a badge written against it typechecked and then rendered nothing.
+        The declaration is correct from 0.6.0; if you are pinned below that, the shape below still works at
+        runtime but will not typecheck.
       </div>
 
       <p>Three things must agree for a badge to appear:</p>
@@ -168,15 +186,21 @@ export class CardsPage {
           { id: 'service', name: 'Service', visible: true, order: 3 },
           { id: 'reference', name: 'Reference', visible: true, order: 4 },
         ],
-        // Declared as required even though the renderer guards for its absence, so an
-        // empty array rather than a conditional spread.
-        badgeItems: withBadges ? [{ id: 'status', name: 'Status', visible: true, order: 1 }] : [],
+        // Two types, so badge ordering is visible: 'length' is on every booking and
+        // 'status' only on some, yet status always renders first because order says so.
+        badgeItems: withBadges
+          ? [
+              { id: 'status', name: 'Status', visible: true, order: 1 },
+              { id: 'length', name: 'Length', visible: true, order: 2 },
+            ]
+          : [],
       },
 
       ...(withBadges
         ? {
             badgeTypes: {
-              status: { style: 'filled', bgColor: '#1f2937', textColor: '#f9fafb', maxWidth: 90 },
+              status: { style: 'filled', bgColor: '#166534', textColor: '#f0fdf4', maxWidth: 90 },
+              length: { style: 'outlined', textColor: 'var(--sc-text-secondary)', maxWidth: 70 },
             },
           }
         : {}),
@@ -184,15 +208,13 @@ export class CardsPage {
       privacySuppression: { textFieldIds: ['client'], badgeIds: [] },
 
       callbacks: {
-        resolveEventFields: (raw: any, mapped: any) => ({
+        resolveEventFields: (raw: any, mapped: MappedEvent) => ({
           textFields: {
-            client: mapped?.clientName ?? '',
-            service: mapped?.serviceName ?? '',
+            client: mapped.clientName,
+            service: mapped.serviceName,
             reference: String(raw?.id ?? '').slice(-6).toUpperCase(),
           },
-          ...(withBadges && raw?.status === 'Completed'
-            ? { badges: [{ typeId: 'status', label: 'Done', tooltip: 'Marked complete' } as any] }
-            : {}),
+          badges: withBadges ? buildBadges(raw) : [],
         }),
       },
     };
@@ -250,7 +272,7 @@ new CalendarApp({
   callbacks: {
     resolveEventFields: (raw) => ({
       badges: raw.status === 'Completed'
-        // typeId — NOT id, whatever the .d.ts says.
+        // typeId is what joins the badge to badgeItems and badgeTypes.
         ? [{ typeId: 'status', label: 'Done', count: undefined, tooltip: 'Marked complete' }]
         : [],
     }),

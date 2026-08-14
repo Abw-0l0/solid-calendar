@@ -98,7 +98,7 @@ import { demoDataSource } from '../data';
             </tr>
             <tr>
               <td><code>calendar.headless.min.js</code> — state and data only</td>
-              <td>26.9 kB</td><td>8.7 kB</td>
+              <td>27.5 kB</td><td>8.9 kB</td>
             </tr>
             <tr><td><code>calendar.css</code></td><td>28.4 kB</td><td>5.0 kB</td></tr>
           </tbody>

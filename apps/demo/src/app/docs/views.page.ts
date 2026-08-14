@@ -157,15 +157,6 @@ const MODE_LABELS: Record<ResourceMode, string> = {
         The library has no date-range restriction, so nothing stops a user paging to 1970. If your product
         needs bounds, clamp in your own handler for <code>date:changed</code> and set the date back.
       </div>
-      <div class="note note--danger">
-        <strong>The date picker's month arrows do not work in 0.5.0.</strong>
-        <code>temporal.addMonths()</code> returns a <code>'YYYY-MM-DD'</code> string, but
-        <code>DatePicker._onPrevMonth</code> and <code>_onNextMonth</code> read <code>.year</code> and
-        <code>.month</code> off the result — both <code>undefined</code>, so the displayed month never
-        advances. The toolbar's own prev and next buttons are unaffected: they call
-        <code>.toString()</code> on the same value and are correct. Until it is fixed, drive month navigation
-        from your own control with <code>state.setCurrentDate()</code>.
-      </div>
     </div>
   `,
   styles: [
