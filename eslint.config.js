@@ -3,7 +3,11 @@ import globals from 'globals';
 
 export default [
     {
-        ignores: ['**/dist/**', '**/node_modules/**', '**/coverage/**'],
+        // apps/ holds the Angular documentation site, which has its own toolchain and
+        // its own TypeScript. This config is JavaScript-only and every glob below is
+        // packages/*, so nothing there would match anyway — but say so explicitly,
+        // since `npm run lint` runs `eslint .` from the repository root.
+        ignores: ['**/dist/**', '**/node_modules/**', '**/coverage/**', 'apps/**'],
     },
 
     {

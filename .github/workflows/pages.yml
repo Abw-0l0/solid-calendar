@@ -1,0 +1,72 @@
+name: Pages
+
+# Builds and publishes the Angular documentation site in apps/demo.
+#
+# This is deliberately a separate workflow from release.yml, which is pinned by npm's
+# trusted-publishing registration — that one must not grow jobs or change filename.
+# Nothing here touches the library: apps/demo is outside the `packages/*` workspaces glob,
+# has its own lockfile, and installs `steadycalendar` from the registry rather than from
+# the working tree. Building the site therefore also proves the published package works.
+#
+# One-time manual step: repository Settings -> Pages -> Source: "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/demo/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+# `pages: write` and `id-token: write` are what deploy-pages needs; contents stays read.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; a superseded run is not worth finishing.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/demo
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/demo/package-lock.json
+
+      - run: npm ci
+
+      # The site is served from a repository subpath, so every asset URL needs the prefix.
+      - run: npm run build -- --base-href "/${{ github.event.repository.name }}/"
+
+      # GitHub Pages has no SPA rewrite: a deep link to /views is a 404 from the static
+      # host before Angular's router ever loads. Serving index.html as the 404 body hands
+      # the route back to the client, which then resolves it normally.
+      - run: cp dist/demo/browser/index.html dist/demo/browser/404.html
+
+      # Jekyll would otherwise skip files beginning with an underscore.
+      - run: touch dist/demo/browser/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: apps/demo/dist/demo/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

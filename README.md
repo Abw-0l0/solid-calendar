@@ -100,6 +100,30 @@ Two defaults worth knowing, both overridable:
 
 Run `examples/index.html` for a working page with three columns, overlapping bookings, a time block and a live event log.
 
+## Using it with Angular
+
+The library is framework-agnostic, so there is no Angular package to install — the same
+`CalendarApp` above works, wrapped in a component that owns its lifecycle:
+
+```html
+<sc-calendar [config]="config" [(date)]="date" (slotSelect)="openDialog($event)" />
+```
+
+`apps/demo` in this repository is a full Angular 22 application built on that wrapper: a
+documentation site covering every option with runnable examples, plus a playground driving
+all of them at once. It installs `steadycalendar` from npm like any other consumer, so it
+also serves as a standing check that the published package works.
+
+```bash
+cd apps/demo && npm install && npm start
+```
+
+The wrapper is two files under `apps/demo/src/app/calendar/`, documented to be copied into
+your own project rather than depended on. Its README covers the five lifecycle constraints
+worth knowing: the config is read live and so is not reactive, `CalendarApp` mutates the
+config object it is given, routine changes belong on `state` rather than the config,
+`init()` is browser-only, and `timezone` is module-global.
+
 ## Your field names
 
 The library reads incoming data in exactly two places, through a declared map. If your API names things differently, say so once instead of reshaping your payload:
