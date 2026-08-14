@@ -110,7 +110,7 @@ jobs:
       # failing loudly beats reporting success having shipped nothing.
       - name: Publish steadycalendar
         if: github.event_name == 'push' || inputs.publish
-        run: npm publish --provenance --access public -w packages/core
+        run: npm publish --provenance --access public -w packages/core --loglevel verbose
 
       # Only reached when the publish above succeeded, so the wording is safe.
       - name: Create the GitHub release
